@@ -206,10 +206,10 @@ Date: _______________            Date: _______________`;
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Contract Templates</h1>
-        <p className="text-muted-foreground">
+    <div className="container py-6 sm:py-10">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Contract Templates</h1>
+        <p className="text-muted-foreground mt-1">
           Generate professional contract templates
         </p>
       </div>
@@ -252,7 +252,7 @@ Date: _______________            Date: _______________`;
               <CardTitle>Contract Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Your Name</Label>
                   <Input
@@ -276,7 +276,7 @@ Date: _______________            Date: _______________`;
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Client Name</Label>
                   <Input
@@ -322,7 +322,7 @@ Date: _______________            Date: _______________`;
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Start Date</Label>
                   <Input
@@ -345,7 +345,7 @@ Date: _______________            Date: _______________`;
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Payment Amount</Label>
                   <Input
@@ -403,8 +403,8 @@ Date: _______________            Date: _______________`;
             </Button>
           </div>
 
-          <div className="border rounded-lg bg-white p-8 shadow-lg print:shadow-none print:border-0">
-            <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800">
+          <div className="border rounded-lg bg-background p-6 sm:p-8 shadow-lg print:shadow-none print:border-0">
+            <pre className="whitespace-pre-wrap font-mono text-xs sm:text-sm text-foreground">
               {getTemplateContent()}
             </pre>
           </div>

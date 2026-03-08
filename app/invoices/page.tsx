@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, Download, Save } from "lucide-react";
+import { Plus, Trash2, Download } from "lucide-react";
 
 interface InvoiceItem {
   id: string;
@@ -78,10 +78,10 @@ export default function InvoicesPage() {
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Invoice Generator</h1>
-        <p className="text-muted-foreground">
+    <div className="container py-6 sm:py-10">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Invoice Generator</h1>
+        <p className="text-muted-foreground mt-1">
           Create professional invoices and download as PDF
         </p>
       </div>
@@ -95,7 +95,7 @@ export default function InvoicesPage() {
               <CardTitle>Invoice Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
                   <Input
@@ -223,12 +223,12 @@ export default function InvoicesPage() {
               <CardDescription>Add the services or products</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {invoice.items?.map((item, index) => (
+              {invoice.items?.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-2 items-end p-4 border rounded-lg"
+                  className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-end p-4 border rounded-lg"
                 >
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 w-full space-y-2">
                     <Label>Description</Label>
                     <Input
                       placeholder="Service or product"
@@ -238,7 +238,7 @@ export default function InvoicesPage() {
                       }
                     />
                   </div>
-                  <div className="w-24 space-y-2">
+                  <div className="w-full sm:w-20 space-y-2">
                     <Label>Qty</Label>
                     <Input
                       type="number"
@@ -249,7 +249,7 @@ export default function InvoicesPage() {
                       }
                     />
                   </div>
-                  <div className="w-28 space-y-2">
+                  <div className="w-full sm:w-28 space-y-2">
                     <Label>Price ($)</Label>
                     <Input
                       type="number"
@@ -261,9 +261,9 @@ export default function InvoicesPage() {
                       }
                     />
                   </div>
-                  <div className="w-28 space-y-2">
+                  <div className="w-full sm:w-24 space-y-2">
                     <Label>Total</Label>
-                    <div className="h-10 px-3 flex items-center border rounded-md bg-muted">
+                    <div className="h-9 sm:h-10 px-3 flex items-center border rounded-md bg-muted text-sm font-medium">
                       ${(item.quantity * item.price).toFixed(2)}
                     </div>
                   </div>
@@ -272,12 +272,13 @@ export default function InvoicesPage() {
                     size="icon"
                     onClick={() => removeItem(item.id)}
                     disabled={(invoice.items?.length || 0) <= 1}
+                    className="flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               ))}
-              <Button variant="outline" onClick={addItem}>
+              <Button variant="outline" onClick={addItem} className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Item
               </Button>
@@ -309,96 +310,98 @@ export default function InvoicesPage() {
           </div>
 
           {/* Print Preview */}
-          <div className="border rounded-lg bg-white p-8 shadow-lg print:shadow-none print:border-0">
+          <div className="border rounded-lg bg-background p-6 sm:p-8 shadow-lg print:shadow-none print:border-0">
             <div className="space-y-6">
               {/* Header */}
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">INVOICE</h2>
-                  <p className="text-gray-600">#{invoice.invoiceNumber}</p>
+                  <h2 className="text-2xl font-bold text-foreground">INVOICE</h2>
+                  <p className="text-muted-foreground">#{invoice.invoiceNumber}</p>
                 </div>
-                <div className="text-right">
-                  <h3 className="font-semibold text-gray-900">
+                <div className="text-left sm:text-right">
+                  <h3 className="font-semibold text-foreground">
                     {invoice.fromName || "Your Company"}
                   </h3>
-                  <p className="text-sm text-gray-600 whitespace-pre-line">
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {invoice.fromAddress}
                   </p>
-                  <p className="text-sm text-gray-600">{invoice.fromEmail}</p>
+                  <p className="text-sm text-muted-foreground">{invoice.fromEmail}</p>
                 </div>
               </div>
 
               {/* Dates */}
-              <div className="flex justify-between border-t pt-4">
+              <div className="flex flex-col sm:flex-row justify-between border-t pt-4 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Invoice Date:</p>
+                  <p className="text-sm text-muted-foreground">Invoice Date:</p>
                   <p className="font-medium">{invoice.date}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Due Date:</p>
+                  <p className="text-sm text-muted-foreground">Due Date:</p>
                   <p className="font-medium">{invoice.dueDate}</p>
                 </div>
               </div>
 
               {/* Bill To */}
               <div className="border-t pt-4">
-                <p className="text-sm text-gray-600 mb-1">Bill To:</p>
-                <h3 className="font-semibold text-gray-900">
+                <p className="text-sm text-muted-foreground mb-1">Bill To:</p>
+                <h3 className="font-semibold text-foreground">
                   {invoice.toName || "Client Name"}
                 </h3>
-                <p className="text-sm text-gray-600 whitespace-pre-line">
+                <p className="text-sm text-muted-foreground whitespace-pre-line">
                   {invoice.toAddress}
                 </p>
-                <p className="text-sm text-gray-600">{invoice.toEmail}</p>
+                <p className="text-sm text-muted-foreground">{invoice.toEmail}</p>
               </div>
 
               {/* Items Table */}
               <div className="border-t pt-4">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 text-sm text-gray-600">Description</th>
-                      <th className="text-center py-2 text-sm text-gray-600">Qty</th>
-                      <th className="text-right py-2 text-sm text-gray-600">Price</th>
-                      <th className="text-right py-2 text-sm text-gray-600">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invoice.items?.map((item) => (
-                      <tr key={item.id} className="border-b">
-                        <td className="py-2">{item.description || "—"}</td>
-                        <td className="text-center py-2">{item.quantity}</td>
-                        <td className="text-right py-2">${item.price.toFixed(2)}</td>
-                        <td className="text-right py-2">
-                          ${(item.quantity * item.price).toFixed(2)}
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 text-sm text-muted-foreground">Description</th>
+                        <th className="text-center py-2 text-sm text-muted-foreground">Qty</th>
+                        <th className="text-right py-2 text-sm text-muted-foreground">Price</th>
+                        <th className="text-right py-2 text-sm text-muted-foreground">Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {invoice.items?.map((item) => (
+                        <tr key={item.id} className="border-b">
+                          <td className="py-2 text-foreground">{item.description || "—"}</td>
+                          <td className="text-center py-2 text-foreground">{item.quantity}</td>
+                          <td className="text-right py-2 text-foreground">${item.price.toFixed(2)}</td>
+                          <td className="text-right py-2 text-foreground">
+                            ${(item.quantity * item.price).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Totals */}
               <div className="border-t pt-4">
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-foreground">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="text-gray-600">Tax (10%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span className="text-muted-foreground">Tax (10%)</span>
+                  <span className="text-foreground">${tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between py-2 border-t font-bold text-lg">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span className="text-foreground">Total</span>
+                  <span className="text-foreground">${total.toFixed(2)}</span>
                 </div>
               </div>
 
               {/* Notes */}
               {invoice.notes && (
                 <div className="border-t pt-4">
-                  <p className="text-sm text-gray-600 font-medium">Notes:</p>
-                  <p className="text-sm text-gray-600">{invoice.notes}</p>
+                  <p className="text-sm text-muted-foreground font-medium">Notes:</p>
+                  <p className="text-sm text-muted-foreground">{invoice.notes}</p>
                 </div>
               )}
             </div>

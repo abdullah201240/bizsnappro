@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   FileText,
   Receipt,
@@ -10,6 +12,8 @@ import {
   Link as LinkIcon,
   QrCode,
   Home,
+  Menu,
+  X,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +27,7 @@ const navItems = [
 
 export function MainNav() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -31,9 +36,11 @@ export function MainNav() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-primary-foreground font-bold">B</span>
           </div>
-          <span className="text-xl font-bold">BizSnapPro</span>
+          <span className="text-xl font-bold hidden sm:inline-block">BizSnapPro</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -42,8 +49,8 @@ export function MainNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
-                  isActive ? "text-primary" : "text-muted-foreground"
+                  "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-muted",
+                  isActive ? "bg-muted text-foreground" : "text-muted-foreground"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -52,25 +59,46 @@ export function MainNav() {
             );
           })}
         </nav>
-        <nav className="flex md:hidden items-center gap-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "p-2 rounded-lg transition-colors hover:bg-muted",
-                  isActive ? "bg-muted text-primary" : "text-muted-foreground"
-                )}
-              >
-                <Icon className="h-5 w-5" />
-              </Link>
-            );
-          })}
-        </nav>
+
+        {/* Mobile Menu Button */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <span className="sr-only">Toggle menu</span>
+        </Button>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t bg-background">
+          <nav className="container py-4 flex flex-col gap-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                    isActive 
+                      ? "bg-primary text-primary-foreground" 
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

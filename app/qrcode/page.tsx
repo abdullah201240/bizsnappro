@@ -42,6 +42,12 @@ export default function QRCodePage() {
     };
 
     setItems([item, ...items]);
+    setNewItem({
+      name: "",
+      content: "",
+      description: "",
+      size: 200,
+    });
   };
 
   const copyToClipboard = (content: string, id: string) => {
@@ -81,10 +87,10 @@ export default function QRCodePage() {
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">QR Code Generator</h1>
-        <p className="text-muted-foreground">
+    <div className="container py-6 sm:py-10">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">QR Code Generator</h1>
+        <p className="text-muted-foreground mt-1">
           Generate QR codes for invoices and payments
         </p>
       </div>
@@ -172,13 +178,13 @@ export default function QRCodePage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2">
               {items.map((item) => (
                 <Card key={item.id}>
                   <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{item.name}</CardTitle>
-                      <div className="flex gap-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-lg truncate">{item.name}</CardTitle>
+                      <div className="flex gap-1 flex-shrink-0">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -215,12 +221,12 @@ export default function QRCodePage() {
                   <CardContent>
                     <div
                       ref={qrRef}
-                      className="flex justify-center p-4 bg-white rounded-lg"
+                      className="flex justify-center p-4 bg-background rounded-lg border"
                     >
                       <QRCodeSVG
                         id={`qr-${item.id}`}
                         value={item.content}
-                        size={item.size}
+                        size={Math.min(item.size, 200)}
                         level={"H"}
                         includeMargin={true}
                       />

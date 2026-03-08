@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link as LinkIcon, Copy, Check, ExternalLink, QrCode } from "lucide-react";
+import { Link as LinkIcon, Copy, Check, ExternalLink } from "lucide-react";
 
 interface PaymentLink {
   id: string;
@@ -93,10 +93,10 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Payment Link Generator</h1>
-        <p className="text-muted-foreground">
+    <div className="container py-6 sm:py-10">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Payment Link Generator</h1>
+        <p className="text-muted-foreground mt-1">
           Generate payment links for your clients
         </p>
       </div>
@@ -232,12 +232,12 @@ export default function PaymentsPage() {
                   {links.map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
+                      className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg gap-4"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0 w-full">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-medium truncate">{link.name}</p>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-muted capitalize">
                             {link.type}
                           </span>
                         </div>
@@ -250,17 +250,19 @@ export default function PaymentsPage() {
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 ml-4">
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(link.link, link.id)}
+                          className="flex-1 sm:flex-initial"
                         >
                           {copiedId === link.id ? (
                             <Check className="h-4 w-4" />
                           ) : (
                             <Copy className="h-4 w-4" />
                           )}
+                          <span className="ml-2 hidden sm:inline">Copy</span>
                         </Button>
                         <a
                           href={link.link}

@@ -112,10 +112,10 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="container py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Expense Tracker</h1>
-        <p className="text-muted-foreground">
+    <div className="container py-6 sm:py-10">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold">Expense Tracker</h1>
+        <p className="text-muted-foreground mt-1">
           Track and manage your business expenses
         </p>
       </div>
@@ -231,9 +231,9 @@ export default function ExpensesPage() {
               <CardTitle>By Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {Object.entries(expensesByCategory).map(([cat, amount]) => (
-                  <div key={cat} className="flex justify-between items-center p-2 border rounded">
+                  <div key={cat} className="flex justify-between items-center p-3 border rounded-lg">
                     <span className="text-sm">{cat}</span>
                     <span className="font-semibold">${amount.toFixed(2)}</span>
                   </div>
@@ -244,12 +244,12 @@ export default function ExpensesPage() {
 
           {/* Expense Table */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <CardTitle>Expense History</CardTitle>
                 <CardDescription>All recorded expenses</CardDescription>
               </div>
-              <Button variant="outline" onClick={handlePrint}>
+              <Button variant="outline" onClick={handlePrint} className="flex-shrink-0">
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -260,44 +260,46 @@ export default function ExpensesPage() {
                   No expenses recorded yet. Add your first expense!
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Vendor</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {expenses.map((expense) => (
-                      <TableRow key={expense.id}>
-                        <TableCell>{expense.date}</TableCell>
-                        <TableCell>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full bg-muted text-xs">
-                            {expense.category}
-                          </span>
-                        </TableCell>
-                        <TableCell>{expense.vendor}</TableCell>
-                        <TableCell>{expense.description}</TableCell>
-                        <TableCell className="text-right font-medium">
-                          ${expense.amount.toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteExpense(expense.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </TableCell>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Vendor</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {expenses.map((expense) => (
+                        <TableRow key={expense.id}>
+                          <TableCell className="whitespace-nowrap">{expense.date}</TableCell>
+                          <TableCell>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full bg-muted text-xs">
+                              {expense.category}
+                            </span>
+                          </TableCell>
+                          <TableCell className="max-w-[150px] truncate">{expense.vendor}</TableCell>
+                          <TableCell className="max-w-[200px] truncate">{expense.description}</TableCell>
+                          <TableCell className="text-right font-medium whitespace-nowrap">
+                            ${expense.amount.toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteExpense(expense.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               )}
             </CardContent>
           </Card>

@@ -32,9 +32,14 @@ export default function RootLayout({
         <main className="flex-1">
           {children}
         </main>
-        <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+        <footer className="border-t py-8 bg-muted/30">
           <div className="container">
-            © {new Date().getFullYear()} BizSnapPro. All rights reserved.
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+              <p>© {new Date().getFullYear()} BizSnapPro. All rights reserved.</p>
+              <p className="text-xs sm:text-sm">
+                All data is stored locally on your device
+              </p>
+            </div>
           </div>
         </footer>
       </body>
