@@ -30,356 +30,137 @@ const socialLinks = [
 ];
 
 export function Footer() {
-  return (
-    <>
+ return (
+    <footer className="relative bg-[#05050a] border-t border-white/10 overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[60px_60px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,black,transparent)]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,rgba(99,102,241,0.08),transparent_70%)] pointer-events-none" />
+
+      <div className="mx-auto  relative z-10 p-8">
+        {/* Trust Badge */}
+        <div className="flex items-center gap-6 p-5 bg-white/[0.02] border border-white/10 rounded-2xl mb-10 flex-wrap">
+          <div className="flex items-center gap-2.5 text-gray-300 text-sm">
+            <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
+              <Lock className="w-4 h-4" style={{ color: "#818cf8" }} />
+            </div>
+            <span>Your data never leaves your device</span>
+          </div>
+          <div className="flex items-center gap-2.5 text-gray-300 text-sm">
+            <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
+              <Shield className="w-4 h-4" style={{ color: "#34d399" }} />
+            </div>
+            <span>100% free, no credit card required</span>
+          </div>
+        </div>
+
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-12">
+          {/* Brand */}
+          <div className="flex flex-col gap-5">
+            <Link href="/" className="flex items-center gap-3 no-underline">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 bg-[length:200%_200%] animate-[footer-gradient_4s_ease_infinite] flex items-center justify-center relative overflow-hidden shadow-[0_4px_20px_rgba(99,102,241,0.4)]">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.2] to-transparent" />
+                <Zap className="w-5 h-5 text-white relative z-10" />
+              </div>
+              <span className="font-syne text-xl font-extrabold text-white tracking-tight">BizSnapPro</span>
+            </Link>
+            <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
+              All-in-one business toolkit for freelancers and small businesses. 
+              Create invoices, track expenses, and manage contracts — all for free.
+            </p>
+            <div className="flex gap-3 mt-2">
+              {socialLinks.map((social) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-gray-400 hover:bg-white/[0.1] hover:border-white/20 hover:text-white transition-all duration-200 hover:-translate-y-0.5"
+                    aria-label={social.label}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Product Links */}
+          <div className="flex flex-col gap-4">
+            <h4 className="text-xs font-semibold text-white tracking-widest uppercase">Product</h4>
+            <div className="flex flex-col gap-3">
+              {footerLinks.product.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-gray-400 no-underline hover:text-white hover:translate-x-1 transition-all duration-200 w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Company Links */}
+          <div className="flex flex-col gap-4">
+            <h4 className="text-xs font-semibold text-white tracking-widest uppercase">Company</h4>
+            <div className="flex flex-col gap-3">
+              {footerLinks.company.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-gray-400 no-underline hover:text-white hover:translate-x-1 transition-all duration-200 w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Legal Links */}
+          <div className="flex flex-col gap-4">
+            <h4 className="text-xs font-semibold text-white tracking-widest uppercase">Legal</h4>
+            <div className="flex flex-col gap-3">
+              {footerLinks.legal.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm text-gray-400 no-underline hover:text-white hover:translate-x-1 transition-all duration-200 w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom */}
+        <div className="flex items-center justify-between pt-8 border-t border-white/10 flex-col md:flex-row gap-4">
+          <p className="text-xs text-gray-500 flex items-center gap-1.5">
+            © {new Date().getFullYear()} BizSnapPro. Made with
+            <Heart className="w-3.5 h-3.5 text-pink-500 animate-[footer-pulse_1.5s_ease-in-out_infinite] fill-current" />
+            for freelancers
+          </p>
+          <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/[0.1] border border-emerald-500/20 rounded-full text-xs font-medium text-emerald-400">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+            All data stored locally
+          </div>
+        </div>
+      </div>
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
-        .footer-root {
-          font-family: 'DM Sans', sans-serif;
-          background: #05050a;
-          border-top: 1px solid rgba(255,255,255,0.06);
-          position: relative;
-          overflow: hidden;
-        }
-
-        /* Background effects */
-        .footer-grid {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px);
-          background-size: 60px 60px;
-          mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, black, transparent);
-        }
-        .footer-glow {
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 600px;
-          height: 300px;
-          background: radial-gradient(ellipse, rgba(99,102,241,0.08), transparent 70%);
-          pointer-events: none;
-        }
-
-        .footer-container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 80px 24px 40px;
-          position: relative;
-          z-index: 1;
-        }
-
-        /* Top Section */
-        .footer-top {
-          display: grid;
-          grid-template-columns: 1.5fr 1fr 1fr 1fr;
-          gap: 60px;
-          margin-bottom: 60px;
-        }
-
-        /* Brand Column */
-        .footer-brand {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .footer-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          text-decoration: none;
-        }
-        .footer-logo-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-          background-size: 200% 200%;
-          animation: footer-gradient 4s ease infinite;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(99,102,241,0.4);
-        }
-        .footer-logo-icon::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-        }
         @keyframes footer-gradient {
           0%,100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
-        .footer-logo-text {
-          font-family: 'Syne', sans-serif;
-          font-size: 22px;
-          font-weight: 800;
-          color: #fff;
-          letter-spacing: -0.02em;
-        }
-        .footer-tagline {
-          font-size: 15px;
-          font-weight: 300;
-          color: rgba(255,255,255,0.5);
-          line-height: 1.7;
-          max-width: 280px;
-        }
-        .footer-social {
-          display: flex;
-          gap: 12px;
-          margin-top: 8px;
-        }
-        .footer-social-link {
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: rgba(255,255,255,0.6);
-          transition: all 0.2s ease;
-        }
-        .footer-social-link:hover {
-          background: rgba(255,255,255,0.1);
-          border-color: rgba(255,255,255,0.15);
-          color: #fff;
-          transform: translateY(-2px);
-        }
 
-        /* Link Columns */
-        .footer-column {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        .footer-column-title {
-          font-size: 13px;
-          font-weight: 600;
-          color: #fff;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-        .footer-links {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .footer-link {
-          font-size: 14px;
-          font-weight: 400;
-          color: rgba(255,255,255,0.5);
-          text-decoration: none;
-          transition: all 0.2s ease;
-          width: fit-content;
-        }
-        .footer-link:hover {
-          color: #fff;
-          transform: translateX(4px);
-        }
-
-        /* Trust Badge */
-        .footer-trust {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-          padding: 20px 24px;
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 16px;
-          margin-bottom: 40px;
-        }
-        .footer-trust-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 13px;
-          color: rgba(255,255,255,0.6);
-        }
-        .footer-trust-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          background: rgba(255,255,255,0.05);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* Bottom Section */
-        .footer-bottom {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-top: 32px;
-          border-top: 1px solid rgba(255,255,255,0.06);
-        }
-        .footer-copyright {
-          font-size: 13px;
-          color: rgba(255,255,255,0.4);
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .footer-copyright-heart {
-          color: #ec4899;
-          animation: footer-pulse 1.5s ease-in-out infinite;
-        }
         @keyframes footer-pulse {
           0%,100% { transform: scale(1); }
           50% { transform: scale(1.1); }
         }
-        .footer-local-badge {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 16px;
-          background: rgba(16,185,129,0.1);
-          border: 1px solid rgba(16,185,129,0.2);
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 500;
-          color: #34d399;
-        }
-
-        @media (max-width: 900px) {
-          .footer-top {
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-          }
-          .footer-brand {
-            grid-column: 1 / -1;
-          }
-          .footer-trust {
-            flex-wrap: wrap;
-            gap: 16px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .footer-container { padding: 60px 20px 32px; }
-          .footer-top {
-            grid-template-columns: 1fr;
-            gap: 32px;
-          }
-          .footer-bottom {
-            flex-direction: column;
-            gap: 16px;
-            text-align: center;
-          }
-        }
       `}</style>
-
-      <footer className="footer-root">
-        <div className="footer-grid" />
-        <div className="footer-glow" />
-
-        <div className="footer-container">
-          {/* Trust Badge */}
-          <div className="footer-trust">
-            <div className="footer-trust-item">
-              <div className="footer-trust-icon">
-                <Lock style={{ width: 16, height: 16, color: "#818cf8" }} />
-              </div>
-              <span>Your data never leaves your device</span>
-            </div>
-            <div className="footer-trust-item">
-              <div className="footer-trust-icon">
-                <Shield style={{ width: 16, height: 16, color: "#34d399" }} />
-              </div>
-              <span>100% free, no credit card required</span>
-            </div>
-          </div>
-
-          {/* Main Footer Content */}
-          <div className="footer-top">
-            {/* Brand */}
-            <div className="footer-brand">
-              <Link href="/" className="footer-logo">
-                <div className="footer-logo-icon">
-                  <Zap style={{ width: 22, height: 22, color: "#fff" }} />
-                </div>
-                <span className="footer-logo-text">BizSnapPro</span>
-              </Link>
-              <p className="footer-tagline">
-                All-in-one business toolkit for freelancers and small businesses. 
-                Create invoices, track expenses, and manage contracts — all for free.
-              </p>
-              <div className="footer-social">
-                {socialLinks.map((social) => {
-                  const Icon = social.icon;
-                  return (
-                    <a
-                      key={social.label}
-                      href={social.href}
-                      className="footer-social-link"
-                      aria-label={social.label}
-                    >
-                      <Icon style={{ width: 18, height: 18 }} />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Product Links */}
-            <div className="footer-column">
-              <h4 className="footer-column-title">Product</h4>
-              <div className="footer-links">
-                {footerLinks.product.map((link) => (
-                  <Link key={link.label} href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Company Links */}
-            <div className="footer-column">
-              <h4 className="footer-column-title">Company</h4>
-              <div className="footer-links">
-                {footerLinks.company.map((link) => (
-                  <Link key={link.label} href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Legal Links */}
-            <div className="footer-column">
-              <h4 className="footer-column-title">Legal</h4>
-              <div className="footer-links">
-                {footerLinks.legal.map((link) => (
-                  <Link key={link.label} href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom */}
-          <div className="footer-bottom">
-            <p className="footer-copyright">
-              © {new Date().getFullYear()} BizSnapPro. Made with
-              <Heart className="footer-copyright-heart" style={{ width: 14, height: 14, fill: "currentColor" }} />
-              for freelancers
-            </p>
-            <div className="footer-local-badge">
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 8px #34d399" }} />
-              All data stored locally
-            </div>
-          </div>
-        </div>
-      </footer>
-    </>
+    </footer>
   );
 }
