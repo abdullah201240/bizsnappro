@@ -517,12 +517,7 @@ export function HeroSection() {
 
         {/* ── Main content ── */}
         <div className="hero-content">
-          {/* Badge */}
-          <div className={`hero-badge ${mounted ? "in" : ""}`}>
-            <span className="badge-pulse" />
-            <Sparkles style={{ width: 14, height: 14 }} />
-            Free forever · No signup required
-          </div>
+          
 
           {/* Eyebrow */}
           <div className={`hero-eyebrow ${mounted ? "in" : ""}`}>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Github, Twitter, Heart, Shield, Lock } from "lucide-react";
+import { Zap, Github, Twitter, Heart } from "lucide-react";
 
 const footerLinks = {
   product: [
@@ -37,22 +37,6 @@ export function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(ellipse,rgba(99,102,241,0.08),transparent_70%)] pointer-events-none" />
 
       <div className="mx-auto  relative z-10 p-8">
-        {/* Trust Badge */}
-        <div className="flex items-center gap-6 p-5 bg-white/[0.02] border border-white/10 rounded-2xl mb-10 flex-wrap">
-          <div className="flex items-center gap-2.5 text-gray-300 text-sm">
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
-              <Lock className="w-4 h-4" style={{ color: "#818cf8" }} />
-            </div>
-            <span>Your data never leaves your device</span>
-          </div>
-          <div className="flex items-center gap-2.5 text-gray-300 text-sm">
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center">
-              <Shield className="w-4 h-4" style={{ color: "#34d399" }} />
-            </div>
-            <span>100% free, no credit card required</span>
-          </div>
-        </div>
-
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 mb-12">
           {/* Brand */}

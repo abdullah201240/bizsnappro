@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Sparkles, Zap, CheckCircle2, Shield, Lock } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 
 export function CTASection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -464,36 +464,14 @@ export function CTASection() {
                 {/* Subtitle */}
                 <p className={`cta-sub ${isVisible ? "in" : ""}`}>
                   Join thousands of freelancers who use BizSnapPro to create invoices, 
-                  track expenses, and manage contracts — all for free.
+                  track expenses, and manage contracts.
                 </p>
-                
-                {/* Trust badges */}
-                <div className={`cta-trust ${isVisible ? "in" : ""}`}>
-                  <div className="cta-trust-item">
-                    <span className="cta-trust-icon">
-                      <CheckCircle2 style={{ width: 14, height: 14, color: "#34d399" }} />
-                    </span>
-                    No credit card required
-                  </div>
-                  <div className="cta-trust-item">
-                    <span className="cta-trust-icon">
-                      <Lock style={{ width: 14, height: 14, color: "#818cf8" }} />
-                    </span>
-                    Data stays on your device
-                  </div>
-                  <div className="cta-trust-item">
-                    <span className="cta-trust-icon">
-                      <Shield style={{ width: 14, height: 14, color: "#fb923c" }} />
-                    </span>
-                    100% free to use
-                  </div>
-                </div>
                 
                 {/* Buttons */}
                 <div className={`cta-buttons ${isVisible ? "in" : ""}`}>
                   <Link href="/invoices" className="cta-btn-primary">
                     <Zap style={{ width: 18, height: 18 }} />
-                    Get Started Free
+                    Get Started
                     <ArrowRight className="cta-btn-arrow" style={{ width: 18, height: 18 }} />
                   </Link>
                   <Link href="/contracts" className="cta-btn-secondary">
@@ -501,11 +479,6 @@ export function CTASection() {
                     <ArrowRight className="cta-btn-arrow" style={{ width: 18, height: 18 }} />
                   </Link>
                 </div>
-                
-                {/* Note */}
-                <p className={`cta-note ${isVisible ? "in" : ""}`}>
-                  No signup required · All data stored locally · Your privacy comes first
-                </p>
               </div>
             </div>
           </div>
