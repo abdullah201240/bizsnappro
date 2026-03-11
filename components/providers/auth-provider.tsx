@@ -27,17 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   
-  if (!supabaseUrl || !supabaseAnonKey) {
-    setIsConfigured(false);
-  }
-  
-  const supabase = createClient();
-
   useEffect(() => {
     if (!supabaseUrl || !supabaseAnonKey) {
+      setIsConfigured(false);
       setLoading(false);
       return;
     }
+    
+    const supabase = createClient();
     
     // Check active sessions and sets up the listener
     const initializeAuth = async () => {
@@ -55,12 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [supabaseUrl, supabaseAnonKey]);
 
   const signIn = async (email: string, password: string) => {
-    if (!isConfigured) {
+    const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const currentKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!currentUrl || !currentKey) {
       return { error: new Error("Supabase is not configured. Please add environment variables.") };
     }
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -69,9 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    if (!isConfigured) {
+    const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const currentKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!currentUrl || !currentKey) {
       return { error: new Error("Supabase is not configured. Please add environment variables.") };
     }
+    const supabase = createClient();
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
@@ -95,9 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    if (!isConfigured) {
+    const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const currentKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!currentUrl || !currentKey) {
       return { error: new Error("Supabase is not configured. Please add environment variables.") };
     }
+    const supabase = createClient();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${window.location.origin}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -109,6 +115,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    const currentUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const currentKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!currentUrl || !currentKey) {
+      return;
+    }
+    const supabase = createClient();
     await supabase.auth.signOut();
   };
 
