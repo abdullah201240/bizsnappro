@@ -88,9 +88,17 @@ export function MainNav() {
 
           {/* CTA & Mobile Toggle */}
           <div className="flex items-center gap-2 md:gap-3">
+            {/* Desktop Login - Hidden on mobile */}
+            <Link 
+              href="/auth/login" 
+              className="hidden md:flex items-center gap-2 px-4 h-10 md:h-11 rounded-full bg-white/5 border border-white/10 text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:bg-white/10"
+            >
+              Log In
+            </Link>
+
             {/* Desktop CTA - Hidden on mobile */}
             <Link 
-              href="/invoices" 
+              href="/auth/signup" 
               className="hidden md:flex items-center gap-2 px-5 h-10 md:h-11 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 bg-[length:200%_200%] text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40"
             >
               Get Started
@@ -163,9 +171,15 @@ export function MainNav() {
           </nav>
 
           {/* Mobile CTA */}
-          <div className="mt-4 pt-4 border-t border-white/6">
+          <div className="mt-4 pt-4 border-t border-white/6 space-y-3">
             <Link
-              href="/invoices"
+              href="/auth/login"
+              className="flex items-center justify-center gap-2 w-full px-6 h-12 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium no-underline transition-all duration-200"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/auth/signup"
               className="flex items-center justify-center gap-2 w-full px-6 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white text-sm font-medium no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40"
             >
               Get Started Free
