@@ -1,27 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowLeft, Plus, Trash2, Download, Receipt, TrendingUp, Calendar, Tag, Store } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Trash2, Download, DollarSign, Receipt, TrendingUp, Calendar, Tag, Store } from "lucide-react";
 
 interface Expense {
   id: string;
@@ -33,16 +17,16 @@ interface Expense {
 }
 
 const categories = [
-  { name: "Office Supplies", color: "bg-blue-100 text-blue-700" },
-  { name: "Travel", color: "bg-amber-100 text-amber-700" },
-  { name: "Meals & Entertainment", color: "bg-rose-100 text-rose-700" },
-  { name: "Software & Subscriptions", color: "bg-purple-100 text-purple-700" },
-  { name: "Equipment", color: "bg-emerald-100 text-emerald-700" },
-  { name: "Marketing", color: "bg-pink-100 text-pink-700" },
-  { name: "Utilities", color: "bg-cyan-100 text-cyan-700" },
-  { name: "Professional Services", color: "bg-indigo-100 text-indigo-700" },
-  { name: "Insurance", color: "bg-orange-100 text-orange-700" },
-  { name: "Other", color: "bg-slate-100 text-slate-700" },
+  { name: "Office Supplies", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+  { name: "Travel", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+  { name: "Meals & Entertainment", color: "bg-rose-500/20 text-rose-400 border-rose-500/30" },
+  { name: "Software & Subscriptions", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+  { name: "Equipment", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+  { name: "Marketing", color: "bg-pink-500/20 text-pink-400 border-pink-500/30" },
+  { name: "Utilities", color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" },
+  { name: "Professional Services", color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30" },
+  { name: "Insurance", color: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+  { name: "Other", color: "bg-slate-500/20 text-slate-400 border-slate-500/30" },
 ];
 
 const categoryMap = Object.fromEntries(categories.map(c => [c.name, c.color]));
@@ -118,260 +102,234 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#05050a] text-white font-sans">
       {/* Header */}
-      <div className="border-b border-border/50 bg-white">
-        <div className="container py-8 sm:py-10">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50">
-                  <Receipt className="h-4 w-4 text-emerald-600" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Expense Tracker</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Track Expenses</h1>
-              <p className="text-muted-foreground mt-1">Monitor and manage your business spending</p>
-            </div>
-            <Button onClick={handlePrint} variant="outline" className="rounded-full">
-              <Download className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
-          </div>
+      <header className="bg-gradient-to-b from-emerald-500/8 to-transparent border-b border-white/6 relative overflow-hidden">
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white no-underline mb-5 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+          
+          <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Track Expenses</h1>
+          <p className="text-sm text-white/50">Monitor and manage your business spending</p>
         </div>
-      </div>
+      </header>
 
-      <div className="container py-8">
+      <main className="max-w-[1600px] mx-auto px-5 md:px-10 py-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Card className="border-border/50 shadow-card">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-900">
-                  <DollarSign className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Expenses</p>
-                  <p className="text-2xl font-bold text-foreground">${totalExpenses.toFixed(2)}</p>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                <Receipt className="w-6 h-6 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border/50 shadow-card">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-50">
-                  <Receipt className="h-6 w-6 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Entries</p>
-                  <p className="text-2xl font-bold text-foreground">{expenses.length}</p>
-                </div>
+              <div>
+                <p className="text-sm text-white/50">Total Expenses</p>
+                <p className="text-2xl font-bold text-white">${totalExpenses.toFixed(2)}</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border/50 shadow-card">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50">
-                  <TrendingUp className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Categories</p>
-                  <p className="text-2xl font-bold text-foreground">{topCategories.length}</p>
-                </div>
+            </div>
+          </div>
+          <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/[0.05] flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-emerald-400" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-sm text-white/50">Total Entries</p>
+                <p className="text-2xl font-bold text-white">{expenses.length}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white/[0.05] flex items-center justify-center">
+                <Tag className="w-6 h-6 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-sm text-white/50">Categories</p>
+                <p className="text-2xl font-bold text-white">{topCategories.length}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Add Expense Form */}
           <div className="lg:col-span-1">
-            <Card className="border-border/50 shadow-card sticky top-24">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add New Expense
-                </CardTitle>
-                <CardDescription>Record a business expense</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3" />
-                    Date
-                  </Label>
+            <div className="bg-white/[0.02] border border-white/6 rounded-2xl sticky top-6 p-6">
+              <h2 className="font-syne text-base font-bold text-white mb-1 flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Add New Expense
+              </h2>
+              <p className="text-xs text-white/40 mb-5">Record a business expense</p>
+              
+              <div className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Date</Label>
                   <Input
                     type="date"
                     value={newExpense.date}
-                    onChange={(e) =>
-                      setNewExpense({ ...newExpense, date: e.target.value })
-                    }
-                    className="h-10"
+                    onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+                    className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                    <Tag className="h-3 w-3" />
-                    Category
-                  </Label>
-                  <Select
+                
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Category</Label>
+                  <select
                     value={newExpense.category}
-                    onValueChange={(value) =>
-                      setNewExpense({ ...newExpense, category: value || "Other" })
-                    }
+                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                    className="bg-white/5 border border-white/10 rounded-xl h-11 px-3 text-sm text-white focus:border-emerald-500/50 focus:ring-emerald-500/20"
                   >
-                    <SelectTrigger className="h-10">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.name} value={cat.name}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {categories.map((cat) => (
+                      <option key={cat.name} value={cat.name} className="bg-[#05050a]">
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
-                    <Store className="h-3 w-3" />
-                    Vendor
-                  </Label>
+                
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Vendor</Label>
                   <Input
                     placeholder="Where did you spend?"
                     value={newExpense.vendor}
-                    onChange={(e) =>
-                      setNewExpense({ ...newExpense, vendor: e.target.value })
-                    }
-                    className="h-10"
+                    onChange={(e) => setNewExpense({ ...newExpense, vendor: e.target.value })}
+                    className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase">Description</Label>
+                
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Description</Label>
                   <Textarea
                     placeholder="What was this expense for?"
                     value={newExpense.description}
-                    onChange={(e) =>
-                      setNewExpense({ ...newExpense, description: e.target.value })
-                    }
-                    rows={2}
+                    onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                    className="bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 min-h-[80px] resize-none"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase">Amount ($)</Label>
+                
+                <div className="flex flex-col gap-2">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Amount ($)</Label>
                   <Input
                     type="number"
                     min="0"
                     step="0.01"
                     placeholder="0.00"
                     value={newExpense.amount || ""}
-                    onChange={(e) =>
-                      setNewExpense({
-                        ...newExpense,
-                        amount: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    className="h-10"
+                    onChange={(e) => setNewExpense({ ...newExpense, amount: parseFloat(e.target.value) || 0 })}
+                    className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                   />
                 </div>
-                <Button onClick={addExpense} className="w-full rounded-lg bg-slate-900 hover:bg-slate-800">
-                  <Plus className="h-4 w-4 mr-2" />
+                
+                <button 
+                  onClick={addExpense}
+                  className="w-full h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-sm font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-emerald-500/30 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
                   Add Expense
-                </Button>
-              </CardContent>
-            </Card>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Expenses List */}
           <div className="lg:col-span-2 space-y-6">
             {/* Category Breakdown */}
             {topCategories.length > 0 && (
-              <Card className="border-border/50 shadow-card">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base font-semibold">Spending by Category</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {topCategories.map((cat) => (
-                      <div key={cat.name} className="p-4 rounded-xl bg-muted/30 border border-border/30">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mb-2 ${cat.color}`}>
-                          {cat.name}
-                        </span>
-                        <p className="text-lg font-bold text-foreground">${cat.amount.toFixed(2)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="bg-white/[0.02] border border-white/6 rounded-2xl p-6">
+                <h2 className="font-syne text-base font-bold text-white mb-4">Spending by Category</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {topCategories.map((cat) => (
+                    <div key={cat.name} className="p-4 rounded-xl bg-white/5 border border-white/6">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mb-2 border ${cat.color}`}>
+                        {cat.name}
+                      </span>
+                      <p className="text-lg font-bold text-white">${cat.amount.toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Expense Table */}
-            <Card className="border-border/50 shadow-card">
-              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
+            <div className="bg-white/[0.02] border border-white/6 rounded-2xl overflow-hidden">
+              <div className="px-6 py-5 border-b border-white/6 flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base font-semibold">Expense History</CardTitle>
-                  <CardDescription>All recorded expenses</CardDescription>
+                  <h2 className="font-syne text-base font-bold text-white">Expense History</h2>
+                  <p className="text-xs text-white/40 mt-0.5">All recorded expenses</p>
                 </div>
-              </CardHeader>
-              <CardContent>
+                <button 
+                  onClick={handlePrint}
+                  className="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-white/5 border border-white/10 text-white/70 text-sm hover:bg-white/10 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Export
+                </button>
+              </div>
+              
+              <div className="p-6">
                 {expenses.length === 0 ? (
                   <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-                      <Receipt className="h-8 w-8 text-muted-foreground" />
+                    <div className="w-16 h-16 rounded-2xl bg-white/[0.05] flex items-center justify-center mx-auto mb-4">
+                      <Receipt className="w-8 h-8 text-white/30" />
                     </div>
-                    <p className="text-muted-foreground">No expenses recorded yet.</p>
-                    <p className="text-sm text-muted-foreground">Add your first expense to get started!</p>
+                    <p className="text-white/50">No expenses recorded yet.</p>
+                    <p className="text-sm text-white/30 mt-1">Add your first expense to get started!</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-border/50">
-                          <TableHead className="text-xs font-medium text-muted-foreground uppercase">Date</TableHead>
-                          <TableHead className="text-xs font-medium text-muted-foreground uppercase">Category</TableHead>
-                          <TableHead className="text-xs font-medium text-muted-foreground uppercase">Vendor</TableHead>
-                          <TableHead className="text-xs font-medium text-muted-foreground uppercase">Description</TableHead>
-                          <TableHead className="text-xs font-medium text-muted-foreground uppercase text-right">Amount</TableHead>
-                          <TableHead className="w-10"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-white/8">
+                          <th className="text-left py-3 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Date</th>
+                          <th className="text-left py-3 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Category</th>
+                          <th className="text-left py-3 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Vendor</th>
+                          <th className="text-left py-3 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Description</th>
+                          <th className="text-right py-3 text-[10px] font-semibold text-white/40 uppercase tracking-wider">Amount</th>
+                          <th className="w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
                         {expenses.map((expense) => (
-                          <TableRow key={expense.id} className="border-border/30">
-                            <TableCell className="whitespace-nowrap text-sm">{expense.date}</TableCell>
-                            <TableCell>
-                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${categoryMap[expense.category] || "bg-slate-100 text-slate-700"}`}>
+                          <tr key={expense.id} className="border-b border-white/4">
+                            <td className="py-3 text-sm text-white/80 whitespace-nowrap">{expense.date}</td>
+                            <td className="py-3">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${categoryMap[expense.category] || "bg-slate-500/20 text-slate-400 border-slate-500/30"}`}>
                                 {expense.category}
                               </span>
-                            </TableCell>
-                            <TableCell className="text-sm max-w-[120px] truncate">{expense.vendor || "—"}</TableCell>
-                            <TableCell className="text-sm max-w-[200px] truncate">{expense.description}</TableCell>
-                            <TableCell className="text-right font-semibold whitespace-nowrap text-sm">
+                            </td>
+                            <td className="py-3 text-sm text-white/60 max-w-[120px] truncate">{expense.vendor || "—"}</td>
+                            <td className="py-3 text-sm text-white/60 max-w-[200px] truncate">{expense.description}</td>
+                            <td className="py-3 text-right font-semibold text-sm text-white whitespace-nowrap">
                               ${expense.amount.toFixed(2)}
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
+                            </td>
+                            <td className="py-3">
+                              <button
                                 onClick={() => deleteExpense(expense.id)}
-                                className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600"
+                                className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/30 transition-colors"
                               >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
                         ))}
-                      </TableBody>
-                    </Table>
+                      </tbody>
+                    </table>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
