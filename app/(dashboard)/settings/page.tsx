@@ -23,6 +23,24 @@ import {
   Timezone, 
   SettingsFormData
 } from "@/lib/types/database";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 
 const defaultSettings: SettingsFormData = {
   name: "",
@@ -170,8 +188,8 @@ export default function SettingsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -186,415 +204,482 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-gray-600">
+        <h1 className="text-2xl font-bold">Settings</h1>
+        <p className="mt-1 text-muted-foreground">
           Manage your business profile, currency, and invoice settings
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-            {error}
-          </div>
+          <Card className="mb-6 border-destructive">
+            <CardContent className="pt-6">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
         )}
 
         {saved && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-            Settings saved successfully!
-          </div>
+          <Card className="mb-6 border-green-500 dark:border-green-700">
+            <CardContent className="pt-6">
+              <p className="text-green-600 dark:text-green-400">Settings saved successfully!</p>
+            </CardContent>
+          </Card>
         )}
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar Tabs */}
+          {/* Sidebar Tabs - Horizontal on mobile, vertical sidebar on desktop */}
           <div className="lg:w-56 flex-shrink-0">
-            <nav className="space-y-1 bg-white rounded-lg shadow p-2">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === tab.id
-                        ? "bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </nav>
+            {/* Mobile: Horizontal scrollable tabs */}
+            <div className="lg:hidden overflow-x-auto pb-2 -mx-4 px-4">
+              <div className="flex gap-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                      className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
+                        activeTab === tab.id
+                          ? "bg-secondary text-secondary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {/* Desktop: Vertical sidebar */}
+            <Card className="hidden lg:block">
+              <CardContent className="p-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
+                        activeTab === tab.id
+                          ? "bg-secondary text-secondary-foreground"
+                          : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Content */}
           <div className="flex-1">
             {/* Business Settings */}
             {activeTab === "business" && (
-              <div className="bg-white rounded-lg shadow p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Business Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={settings.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Your Business Name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Business Type
-                    </label>
-                    <select
-                      name="business_type"
-                      value={settings.business_type}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="individual">Individual / Sole Proprietor</option>
-                      <option value="llc">LLC</option>
-                      <option value="corporation">Corporation</option>
-                      <option value="partnership">Partnership</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={settings.email}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="business@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={settings.phone}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="+1 234 567 8900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                    <input
-                      type="url"
-                      name="website"
-                      value={settings.website}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="https://example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tax ID / VAT</label>
-                    <input
-                      type="text"
-                      name="tax_id"
-                      value={settings.tax_id}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="XX-XXXXXXX"
-                    />
-                  </div>
-                </div>
-
-                <div className="border-t pt-4">
-                  <h3 className="text-md font-medium text-gray-900 mb-3">Address</h3>
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      name="address_line1"
-                      value={settings.address_line1}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Street address"
-                    />
-                    <input
-                      type="text"
-                      name="address_line2"
-                      value={settings.address_line2}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Apartment, suite, etc."
-                    />
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      <input
-                        type="text"
-                        name="city"
-                        value={settings.city}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Business Information</CardTitle>
+                  <CardDescription>
+                    Enter your business details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Business Name *</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={settings.name}
                         onChange={handleChange}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="City"
+                        required
+                        placeholder="Your Business Name"
                       />
-                      <input
-                        type="text"
-                        name="state"
-                        value={settings.state}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="business_type">Business Type</Label>
+                      <Select
+                        name="business_type"
+                        value={settings.business_type}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, business_type: value || "individual" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select business type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="individual">Individual / Sole Proprietor</SelectItem>
+                          <SelectItem value="llc">LLC</SelectItem>
+                          <SelectItem value="corporation">Corporation</SelectItem>
+                          <SelectItem value="partnership">Partnership</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={settings.email}
                         onChange={handleChange}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="State"
+                        placeholder="business@example.com"
                       />
-                      <input
-                        type="text"
-                        name="postal_code"
-                        value={settings.postal_code}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={settings.phone}
                         onChange={handleChange}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="Postal Code"
+                        placeholder="+1 234 567 8900"
                       />
-                      <input
-                        type="text"
-                        name="country"
-                        value={settings.country}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="website">Website</Label>
+                      <Input
+                        id="website"
+                        type="url"
+                        name="website"
+                        value={settings.website}
                         onChange={handleChange}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        placeholder="Country"
+                        placeholder="https://example.com"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tax_id">Tax ID / VAT</Label>
+                      <Input
+                        id="tax_id"
+                        type="text"
+                        name="tax_id"
+                        value={settings.tax_id}
+                        onChange={handleChange}
+                        placeholder="XX-XXXXXXX"
                       />
                     </div>
                   </div>
-                </div>
-              </div>
+
+                  <div className="border-t pt-4">
+                    <h3 className="text-md font-medium mb-3">Address</h3>
+                    <div className="space-y-3">
+                      <Input
+                        type="text"
+                        name="address_line1"
+                        value={settings.address_line1}
+                        onChange={handleChange}
+                        placeholder="Street address"
+                      />
+                      <Input
+                        type="text"
+                        name="address_line2"
+                        value={settings.address_line2}
+                        onChange={handleChange}
+                        placeholder="Apartment, suite, etc."
+                      />
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <Input
+                          type="text"
+                          name="city"
+                          value={settings.city}
+                          onChange={handleChange}
+                          placeholder="City"
+                        />
+                        <Input
+                          type="text"
+                          name="state"
+                          value={settings.state}
+                          onChange={handleChange}
+                          placeholder="State"
+                        />
+                        <Input
+                          type="text"
+                          name="postal_code"
+                          value={settings.postal_code}
+                          onChange={handleChange}
+                          placeholder="Postal Code"
+                        />
+                        <Input
+                          type="text"
+                          name="country"
+                          value={settings.country}
+                          onChange={handleChange}
+                          placeholder="Country"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Locale & Currency Settings */}
             {activeTab === "locale" && (
-              <div className="bg-white rounded-lg shadow p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">Locale & Currency</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
-                    <select
-                      name="timezone"
-                      value={settings.timezone}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {timezones.map((tz) => (
-                        <option key={tz.id} value={tz.name}>
-                          {tz.name} ({tz.offset})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Locale & Currency</CardTitle>
+                  <CardDescription>
+                    Set your timezone and currency preferences
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="timezone">Timezone</Label>
+                      <Select
+                        name="timezone"
+                        value={settings.timezone}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, timezone: value || "UTC" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select timezone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timezones.map((tz) => (
+                            <SelectItem key={tz.id} value={tz.name}>
+                              {tz.name} ({tz.offset})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
-                    <select
-                      name="locale"
-                      value={settings.locale}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="en">English (US)</option>
-                      <option value="en-GB">English (UK)</option>
-                      <option value="es">Español</option>
-                      <option value="fr">Français</option>
-                      <option value="de">Deutsch</option>
-                      <option value="ar">العربية</option>
-                      <option value="bn">বাংলা</option>
-                      <option value="hi">हिन्दी</option>
-                      <option value="ja">日本語</option>
-                      <option value="zh">中文</option>
-                    </select>
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="locale">Language</Label>
+                      <Select
+                        name="locale"
+                        value={settings.locale}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, locale: value || "en" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English (US)</SelectItem>
+                          <SelectItem value="en-GB">English (UK)</SelectItem>
+                          <SelectItem value="es">Español</SelectItem>
+                          <SelectItem value="fr">Français</SelectItem>
+                          <SelectItem value="de">Deutsch</SelectItem>
+                          <SelectItem value="ar">العربية</SelectItem>
+                          <SelectItem value="bn">বাংলা</SelectItem>
+                          <SelectItem value="hi">हिन्दी</SelectItem>
+                          <SelectItem value="ja">日本語</SelectItem>
+                          <SelectItem value="zh">中文</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Default Currency</label>
-                    <select
-                      name="default_currency"
-                      value={settings.default_currency}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {currencies.map((currency) => (
-                        <option key={currency.code} value={currency.code}>
-                          {currency.code} - {currency.name} ({currency.symbol})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="default_currency">Default Currency</Label>
+                      <Select
+                        name="default_currency"
+                        value={settings.default_currency}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, default_currency: value || "USD" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {currencies.map((currency) => (
+                            <SelectItem key={currency.code} value={currency.code}>
+                              {currency.code} - {currency.name} ({currency.symbol})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Format</label>
-                    <select
-                      name="date_format"
-                      value={settings.date_format}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="YYYY-MM-DD">2024-12-31</option>
-                      <option value="DD/MM/YYYY">31/12/2024</option>
-                      <option value="MM/DD/YYYY">12/31/2024</option>
-                    </select>
+                    <div className="space-y-2">
+                      <Label htmlFor="date_format">Date Format</Label>
+                      <Select
+                        name="date_format"
+                        value={settings.date_format}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, date_format: value || "YYYY-MM-DD" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select date format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="YYYY-MM-DD">2024-12-31</SelectItem>
+                          <SelectItem value="DD/MM/YYYY">31/12/2024</SelectItem>
+                          <SelectItem value="MM/DD/YYYY">12/31/2024</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Invoice Settings */}
             {activeTab === "invoice" && (
-              <div className="bg-white rounded-lg shadow p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">Invoice Settings</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Prefix</label>
-                    <input
-                      type="text"
-                      name="invoice_prefix"
-                      value={settings.invoice_prefix}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Invoice Settings</CardTitle>
+                  <CardDescription>
+                    Configure your invoice defaults
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice_prefix">Invoice Prefix</Label>
+                      <Input
+                        id="invoice_prefix"
+                        type="text"
+                        name="invoice_prefix"
+                        value={settings.invoice_prefix}
+                        onChange={handleChange}
+                        placeholder="INV-"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice_start_number">Starting Number</Label>
+                      <Input
+                        id="invoice_start_number"
+                        type="number"
+                        name="invoice_start_number"
+                        value={settings.invoice_start_number}
+                        onChange={handleChange}
+                        min={1}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice_default_payment_terms">Payment Terms</Label>
+                      <Select
+                        name="invoice_default_payment_terms"
+                        value={settings.invoice_default_payment_terms}
+                        onValueChange={(value) => setSettings(prev => ({ ...prev, invoice_default_payment_terms: value || "net30" }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select payment terms" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="due_on_receipt">Due on Receipt</SelectItem>
+                          <SelectItem value="net15">Net 15</SelectItem>
+                          <SelectItem value="net30">Net 30</SelectItem>
+                          <SelectItem value="net45">Net 45</SelectItem>
+                          <SelectItem value="net60">Net 60</SelectItem>
+                          <SelectItem value="net90">Net 90</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice_default_tax_rate">Default Tax Rate (%)</Label>
+                      <Input
+                        id="invoice_default_tax_rate"
+                        type="number"
+                        name="invoice_default_tax_rate"
+                        value={settings.invoice_default_tax_rate}
+                        onChange={handleChange}
+                        min={0}
+                        max={100}
+                        step={0.01}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="invoice_default_notes">Default Notes</Label>
+                    <Textarea
+                      id="invoice_default_notes"
+                      name="invoice_default_notes"
+                      value={settings.invoice_default_notes}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="INV-"
+                      rows={2}
+                      placeholder="Thank you for your business!"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Starting Number</label>
-                    <input
-                      type="number"
-                      name="invoice_start_number"
-                      value={settings.invoice_start_number}
-                      onChange={handleChange}
-                      min={1}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
-                    <select
-                      name="invoice_default_payment_terms"
-                      value={settings.invoice_default_payment_terms}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="due_on_receipt">Due on Receipt</option>
-                      <option value="net15">Net 15</option>
-                      <option value="net30">Net 30</option>
-                      <option value="net45">Net 45</option>
-                      <option value="net60">Net 60</option>
-                      <option value="net90">Net 90</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Default Tax Rate (%)</label>
-                    <input
-                      type="number"
-                      name="invoice_default_tax_rate"
-                      value={settings.invoice_default_tax_rate}
-                      onChange={handleChange}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Default Notes</label>
-                  <textarea
-                    name="invoice_default_notes"
-                    value={settings.invoice_default_notes}
-                    onChange={handleChange}
-                    rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Thank you for your business!"
-                  />
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Tax Settings */}
             {activeTab === "tax" && (
-              <div className="bg-white rounded-lg shadow p-6 space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">Tax Settings</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Enable Tax (%)</label>
-                    <input
-                      type="number"
-                      name="enable_tax"
-                      value={settings.enable_tax}
-                      onChange={handleChange}
-                      min={0}
-                      max={100}
-                      step={0.01}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tax Settings</CardTitle>
+                  <CardDescription>
+                    Configure your tax settings
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="enable_tax">Enable Tax (%)</Label>
+                      <Input
+                        id="enable_tax"
+                        type="number"
+                        name="enable_tax"
+                        value={settings.enable_tax}
+                        onChange={handleChange}
+                        min={0}
+                        max={100}
+                        step={0.01}
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tax Label</label>
-                    <input
-                      type="text"
-                      name="tax_label"
-                      value={settings.tax_label}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Tax, VAT, GST"
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tax_label">Tax Label</Label>
+                      <Input
+                        id="tax_label"
+                        type="text"
+                        name="tax_label"
+                        value={settings.tax_label}
+                        onChange={handleChange}
+                        placeholder="Tax, VAT, GST"
+                      />
+                    </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tax Number</label>
-                    <input
-                      type="text"
-                      name="tax_number"
-                      value={settings.tax_number}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Your tax registration number"
-                    />
+                    <div className="md:col-span-2 space-y-2">
+                      <Label htmlFor="tax_number">Tax Number</Label>
+                      <Input
+                        id="tax_number"
+                        type="text"
+                        name="tax_number"
+                        value={settings.tax_number}
+                        onChange={handleChange}
+                        placeholder="Your tax registration number"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Save Button */}
             <div className="mt-6 flex justify-end">
-              <button
+              <Button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-500 text-white font-medium rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50"
+                className="gap-2"
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
+                    <Save className="h-4 w-4" />
                     Save Settings
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
