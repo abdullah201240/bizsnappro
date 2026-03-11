@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isConfigured: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
@@ -20,9 +21,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isConfigured, setIsConfigured] = useState(true);
+  
+  // Check if Supabase is configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    setIsConfigured(false);
+  }
+  
   const supabase = createClient();
 
   useEffect(() => {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setLoading(false);
+      return;
+    }
+    
     // Check active sessions and sets up the listener
     const initializeAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -42,6 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!isConfigured) {
+      return { error: new Error("Supabase is not configured. Please add environment variables.") };
+    }
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -50,6 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    if (!isConfigured) {
+      return { error: new Error("Supabase is not configured. Please add environment variables.") };
+    }
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
@@ -73,6 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
+    if (!isConfigured) {
+      return { error: new Error("Supabase is not configured. Please add environment variables.") };
+    }
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${window.location.origin}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -93,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         loading,
+        isConfigured,
         signIn,
         signUp,
         signInWithGoogle,
