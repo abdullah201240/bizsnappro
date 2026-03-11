@@ -27,15 +27,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const sidebarItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/invoices", label: "Invoices" },
-  { href: "/customers", label: "Customers" },
-  { href: "/expenses", label: "Expenses" },
-  { href: "/income", label: "Income" },
-  { href: "/contracts", label: "Contracts" },
-  { href: "/payments", label: "Payments" },
-  { href: "/reports", label: "Reports" },
-  { href: "/settings", label: "Settings" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/customers", label: "Customers", icon: Users },
+  { href: "/expenses", label: "Expenses", icon: Receipt },
+  { href: "/income", label: "Income", icon: TrendingUp },
+  { href: "/contracts", label: "Contracts", icon: FileSignature },
+  { href: "/payments", label: "Payments", icon: LinkIcon },
+  { href: "/reports", label: "Reports", icon: BarChart3 },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function DashboardSidebar({ children }: { children: React.ReactNode }) {
@@ -68,6 +68,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         {/* Navigation */}
         <nav className="p-2 space-y-1">
           {sidebarItems.map((item) => {
+            const Icon = item.icon;
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
@@ -79,7 +80,8 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
                     : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
                 }`}
               >
-                <span>{item.label}</span>
+                <Icon className="h-5 w-5 flex-shrink-0" />
+                {sidebarOpen && <span>{item.label}</span>}
               </Link>
             );
           })}
@@ -127,18 +129,20 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
             </div>
             <nav className="space-y-1">
               {sidebarItems.map((item) => {
+                const Icon = item.icon;
                 const isActive = pathname === item.href;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`block px-3 py-2 rounded-md text-sm font-medium ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium ${
                       isActive
                         ? "bg-secondary text-secondary-foreground"
                         : "text-muted-foreground"
                     }`}
                   >
+                    <Icon className="h-5 w-5" />
                     {item.label}
                   </Link>
                 );
