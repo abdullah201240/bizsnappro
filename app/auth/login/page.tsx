@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signIn, signInWithGoogle, loading: authLoading } = useAuth();
@@ -192,5 +192,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#05050a]" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
