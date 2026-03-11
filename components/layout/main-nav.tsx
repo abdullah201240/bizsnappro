@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   FileText,
@@ -13,7 +13,13 @@ import {
   X,
   Zap,
   ArrowRight,
+  Settings,
+  LogOut,
+  User,
+  LayoutDashboard,
+  TrendingUp,
 } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
@@ -24,10 +30,28 @@ const navItems = [
   { href: "/qrcode", label: "QR Codes", icon: QrCode },
 ];
 
+const dashboardNavItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/customers", label: "Customers", icon: User },
+  { href: "/expenses", label: "Expenses", icon: Receipt },
+  { href: "/income", label: "Income", icon: TrendingUp },
+  { href: "/contracts", label: "Contracts", icon: FileSignature },
+  { href: "/payments", label: "Payments", icon: LinkIcon },
+  { href: "/reports", label: "Reports", icon: FileText },
+  { href: "/settings", label: "Settings", icon: Settings },
+];
+
 export function MainNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const isAuthenticated = !loading && !!user;
+  const currentNavItems = isAuthenticated ? dashboardNavItems : navItems;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,7 +90,7 @@ export function MainNav() {
 
           {/* Desktop Navigation - Hidden on mobile, visible on lg screens */}
           <nav className="hidden lg:flex items-center gap-1 p-1.5 bg-white/[0.03] border border-white/6 rounded-full">
-            {navItems.map((item) => {
+            {currentNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
@@ -88,22 +112,64 @@ export function MainNav() {
 
           {/* CTA & Mobile Toggle */}
           <div className="flex items-center gap-2 md:gap-3">
-            {/* Desktop Login - Hidden on mobile */}
-            <Link 
-              href="/auth/login" 
-              className="hidden md:flex items-center gap-2 px-4 h-10 md:h-11 rounded-full bg-white/5 border border-white/10 text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:bg-white/10"
-            >
-              Log In
-            </Link>
+            {isAuthenticated ? (
+              <>
+                {/* User Menu */}
+                <div className="relative hidden md:block">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 px-3 h-10 md:h-11 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium no-underline transition-all duration-200 hover:bg-white/10"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <span className="hidden lg:inline">Account</span>
+                  </button>
+                  
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-[#0a0a12] border border-white/10 rounded-xl shadow-xl overflow-hidden">
+                      <Link
+                        href="/settings"
+                        className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        Settings
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await signOut();
+                          router.push("/");
+                        }}
+                        className="flex items-center gap-2 w-full px-4 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Desktop Login - Hidden on mobile */}
+                <Link 
+                  href="/auth/login" 
+                  className="hidden md:flex items-center gap-2 px-4 h-10 md:h-11 rounded-full bg-white/5 border border-white/10 text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:bg-white/10"
+                >
+                  Log In
+                </Link>
 
-            {/* Desktop CTA - Hidden on mobile */}
-            <Link 
-              href="/auth/signup" 
-              className="hidden md:flex items-center gap-2 px-5 h-10 md:h-11 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 bg-[length:200%_200%] text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40"
-            >
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
-            </Link>
+                {/* Desktop CTA - Hidden on mobile */}
+                <Link 
+                  href="/auth/signup" 
+                  className="hidden md:flex items-center gap-2 px-5 h-10 md:h-11 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 bg-[length:200%_200%] text-white text-xs md:text-sm font-medium no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40"
+                >
+                  Get Started
+                  <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                </Link>
+              </>
+            )}
 
             {/* Mobile Menu Button - Visible on mobile, hidden on lg */}
             <button

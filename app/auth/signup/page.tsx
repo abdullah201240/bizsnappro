@@ -16,7 +16,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +28,8 @@ export default function SignupPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
-      setSuccess(true);
+      // Redirect to login with success message
+      router.push("/auth/login?registered=true");
     }
   };
 
@@ -40,32 +40,6 @@ export default function SignupPage() {
       setError(error.message);
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-[#05050a] text-white font-sans flex">
-        <div className="flex-1 flex flex-col justify-center px-5 py-12 sm:px-8 lg:px-12">
-          <div className="max-w-md w-full mx-auto text-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
-              <Zap className="w-8 h-8 text-emerald-400" />
-            </div>
-            
-            <h1 className="font-syne text-2xl font-extrabold text-white mb-2">Check your email</h1>
-            <p className="text-sm text-white/50 mb-8">
-              We've sent you a confirmation email. Please check your inbox and click the link to verify your account.
-            </p>
-            
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-medium"
-            >
-              Back to Login
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#05050a] text-white font-sans flex">

@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, CheckCircle } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn, signInWithGoogle, loading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(searchParams.get("registered") === "true");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +28,7 @@ export default function LoginPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
-      router.push("/invoices");
+      router.push("/dashboard");
     }
   };
 
@@ -61,6 +63,14 @@ export default function LoginPage() {
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               {error}
+            </div>
+          )}
+
+          {/* Success Message */}
+          {success && (
+            <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              Account created! Please check your email to verify.
             </div>
           )}
 
