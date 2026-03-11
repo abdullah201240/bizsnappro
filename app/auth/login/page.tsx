@@ -3,33 +3,39 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, Github } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { signIn, signInWithGoogle, loading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
-    // TODO: Implement login with Supabase
-    setTimeout(() => {
+
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      setError(error.message);
       setIsLoading(false);
+    } else {
       router.push("/invoices");
-    }, 1000);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth with Supabase
-    router.push("/invoices");
-  };
-
-  const handleGithubLogin = () => {
-    // TODO: Implement GitHub OAuth with Supabase
-    router.push("/invoices");
+  const handleGoogleLogin = async () => {
+    setError("");
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -51,11 +57,19 @@ export default function LoginPage() {
             <p className="text-sm text-white/50">Sign in to your account to continue</p>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Social Login */}
           <div className="space-y-3 mb-6">
             <button
               onClick={handleGoogleLogin}
-              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all"
+              disabled={isLoading || authLoading}
+              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -64,13 +78,6 @@ export default function LoginPage() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               Continue with Google
-            </button>
-            <button
-              onClick={handleGithubLogin}
-              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              <Github className="w-5 h-5" />
-              Continue with GitHub
             </button>
           </div>
 
@@ -135,7 +142,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || authLoading}
               className="w-full h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50"
             >
               {isLoading ? (

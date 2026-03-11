@@ -3,36 +3,69 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, Github, User, Building2 } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, ArrowRight, User, Building2 } from "lucide-react";
+import { useAuth } from "@/components/providers/auth-provider";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { signUp, signInWithGoogle, loading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState<"individual" | "business">("individual");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
-    // TODO: Implement signup with Supabase
-    setTimeout(() => {
+
+    const { error } = await signUp(email, password, name);
+    
+    if (error) {
+      setError(error.message);
       setIsLoading(false);
-      router.push("/invoices");
-    }, 1000);
+    } else {
+      setSuccess(true);
+    }
   };
 
-  const handleGoogleSignup = () => {
-    // TODO: Implement Google OAuth with Supabase
-    router.push("/invoices");
+  const handleGoogleSignup = async () => {
+    setError("");
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setError(error.message);
+    }
   };
 
-  const handleGithubSignup = () => {
-    // TODO: Implement GitHub OAuth with Supabase
-    router.push("/invoices");
-  };
+  if (success) {
+    return (
+      <div className="min-h-screen bg-[#05050a] text-white font-sans flex">
+        <div className="flex-1 flex flex-col justify-center px-5 py-12 sm:px-8 lg:px-12">
+          <div className="max-w-md w-full mx-auto text-center">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+              <Zap className="w-8 h-8 text-emerald-400" />
+            </div>
+            
+            <h1 className="font-syne text-2xl font-extrabold text-white mb-2">Check your email</h1>
+            <p className="text-sm text-white/50 mb-8">
+              We've sent you a confirmation email. Please check your inbox and click the link to verify your account.
+            </p>
+            
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-medium"
+            >
+              Back to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#05050a] text-white font-sans flex">
@@ -52,6 +85,13 @@ export default function SignupPage() {
             <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Create your account</h1>
             <p className="text-sm text-white/50">Start managing your business today</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Account Type Selection */}
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -87,7 +127,8 @@ export default function SignupPage() {
           <div className="space-y-3 mb-6">
             <button
               onClick={handleGoogleSignup}
-              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all"
+              disabled={isLoading || authLoading}
+              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -96,13 +137,6 @@ export default function SignupPage() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               Sign up with Google
-            </button>
-            <button
-              onClick={handleGithubSignup}
-              className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white font-medium flex items-center justify-center gap-3 hover:bg-white/10 hover:border-white/20 transition-all"
-            >
-              <Github className="w-5 h-5" />
-              Sign up with GitHub
             </button>
           </div>
 
@@ -184,7 +218,7 @@ export default function SignupPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || authLoading}
               className="w-full h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-indigo-500/30 transition-all disabled:opacity-50"
             >
               {isLoading ? (
