@@ -51,7 +51,9 @@ export function MainNav() {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isAuthenticated = !loading && !!user;
-  const currentNavItems = isAuthenticated ? dashboardNavItems : navItems;
+  const isHomePage = pathname === "/";
+  // Show public nav items on home page, dashboard items on other pages when authenticated
+  const currentNavItems = isHomePage ? navItems : (isAuthenticated ? dashboardNavItems : navItems);
 
   useEffect(() => {
     const handleScroll = () => {
