@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -13,7 +11,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileSignature, Download, Briefcase, Users, Palette, Code, Calendar, DollarSign, FileText } from "lucide-react";
+import { 
+  FileSignature, 
+  Download, 
+  Briefcase, 
+  Users, 
+  Palette, 
+  Code, 
+  Calendar, 
+  DollarSign, 
+  FileText,
+  ArrowLeft
+} from "lucide-react";
+import Link from "next/link";
 
 interface ContractDetails {
   templateType: string;
@@ -36,28 +46,36 @@ const contractTemplates = [
     name: "Freelance Service Agreement",
     description: "General freelance contract for services",
     icon: Briefcase,
-    color: "bg-blue-50 text-blue-600",
+    gradient: "from-blue-500/20 to-blue-600/20",
+    border: "border-blue-500/30",
+    text: "text-blue-400",
   },
   {
     id: "consulting",
     name: "Consulting Agreement",
     description: "Professional consulting services contract",
     icon: Users,
-    color: "bg-purple-50 text-purple-600",
+    gradient: "from-purple-500/20 to-purple-600/20",
+    border: "border-purple-500/30",
+    text: "text-purple-400",
   },
   {
     id: "design",
     name: "Design Services Agreement",
     description: "Graphic design or creative services contract",
     icon: Palette,
-    color: "bg-pink-50 text-pink-600",
+    gradient: "from-pink-500/20 to-pink-600/20",
+    border: "border-pink-500/30",
+    text: "text-pink-400",
   },
   {
     id: "development",
     name: "Web Development Agreement",
     description: "Website or software development contract",
     icon: Code,
-    color: "bg-emerald-50 text-emerald-600",
+    gradient: "from-emerald-500/20 to-emerald-600/20",
+    border: "border-emerald-500/30",
+    text: "text-emerald-400",
   },
 ];
 
@@ -217,43 +235,52 @@ Date: _______________            Date: _______________`;
   const SelectedIcon = selectedTemplate?.icon || Briefcase;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#05050a] text-white font-sans">
       {/* Header */}
-      <div className="border-b border-border/50 bg-white">
-        <div className="container py-8 sm:py-10">
+      <header className="bg-gradient-to-b from-violet-500/8 to-transparent border-b border-white/6 relative overflow-hidden">
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-violet-50">
-                  <FileSignature className="h-4 w-4 text-violet-600" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-600/20 flex items-center justify-center">
+                  <FileSignature className="w-5 h-5 text-violet-400" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contract Generator</span>
+                <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Contract Generator</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Create Contract</h1>
-              <p className="text-muted-foreground mt-1">Generate professional contract templates</p>
+              <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Create Contract</h1>
+              <p className="text-sm text-white/50">Generate professional contract templates</p>
             </div>
-            <Button onClick={handlePrint} className="rounded-full bg-slate-900 hover:bg-slate-800">
-              <Download className="h-4 w-4 mr-2" />
+            <button 
+              onClick={handlePrint}
+              className="h-11 px-5 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 text-white text-sm font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-violet-500/30 transition-all"
+            >
+              <Download className="w-4 h-4" />
               Download Contract
-            </Button>
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container py-8">
+      <main className="max-w-[1600px] mx-auto px-5 md:px-10 py-8">
         <div className="grid gap-6 lg:grid-cols-5">
           {/* Form */}
           <div className="lg:col-span-3 space-y-6">
             {/* Template Selection */}
-            <Card className="border-border/50 shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-xs font-bold text-slate-600">1</span>
+            <div className="bg-white/[0.02] border border-white/6 rounded-2xl overflow-hidden">
+              <div className="px-6 py-5 border-b border-white/6">
+                <h2 className="font-syne text-base font-bold text-white flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-xs font-bold text-white/70">1</span>
                   Select Template
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {contractTemplates.map((template) => {
                     const Icon = template.icon;
                     const isSelected = details.templateType === template.id;
@@ -263,55 +290,55 @@ Date: _______________            Date: _______________`;
                         onClick={() => setDetails({ ...details, templateType: template.id })}
                         className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
                           isSelected 
-                            ? "border-slate-900 bg-slate-50" 
-                            : "border-border/50 hover:border-border hover:bg-muted/30"
+                            ? `border-violet-500/50 bg-violet-500/10` 
+                            : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
                         }`}
                       >
-                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${template.color}`}>
-                          <Icon className="h-5 w-5" />
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${template.gradient} border ${template.border}`}>
+                          <Icon className={`h-5 w-5 ${template.text}`} />
                         </div>
                         <div>
-                          <p className={`font-medium text-sm ${isSelected ? "text-slate-900" : "text-foreground"}`}>
+                          <p className={`font-medium text-sm ${isSelected ? "text-white" : "text-white/80"}`}>
                             {template.name}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{template.description}</p>
+                          <p className="text-xs text-white/40 mt-0.5">{template.description}</p>
                         </div>
                       </button>
                     );
                   })}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Contract Details */}
-            <Card className="border-border/50 shadow-card">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-xs font-bold text-slate-600">2</span>
+            <div className="bg-white/[0.02] border border-white/6 rounded-2xl overflow-hidden">
+              <div className="px-6 py-5 border-b border-white/6">
+                <h2 className="font-syne text-base font-bold text-white flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-xs font-bold text-white/70">2</span>
                   Contract Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+                </h2>
+              </div>
+              <div className="p-6 space-y-6">
                 {/* Service Provider */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-2">
                     <SelectedIcon className="h-4 w-4" />
                     Service Provider (You)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Full Name</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Full Name</Label>
                       <Input
                         placeholder="Your name or company"
                         value={details.contractorName}
                         onChange={(e) =>
                           setDetails({ ...details, contractorName: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Email</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Email</Label>
                       <Input
                         type="email"
                         placeholder="your@email.com"
@@ -319,32 +346,32 @@ Date: _______________            Date: _______________`;
                         onChange={(e) =>
                           setDetails({ ...details, contractorEmail: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Client */}
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="space-y-4 pt-5 border-t border-white/6">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Client Information
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Client Name</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Client Name</Label>
                       <Input
                         placeholder="Client name or company"
                         value={details.clientName}
                         onChange={(e) =>
                           setDetails({ ...details, clientName: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Client Email</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Client Email</Label>
                       <Input
                         type="email"
                         placeholder="client@email.com"
@@ -352,109 +379,109 @@ Date: _______________            Date: _______________`;
                         onChange={(e) =>
                           setDetails({ ...details, clientEmail: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Project */}
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="space-y-4 pt-5 border-t border-white/6">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-2">
                     <FileText className="h-4 w-4" />
                     Project Details
                   </h4>
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase">Project Name</Label>
+                    <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Project Name</Label>
                     <Input
                       placeholder="What is this project called?"
                       value={details.projectName}
                       onChange={(e) =>
                         setDetails({ ...details, projectName: e.target.value })
                       }
-                      className="h-10"
+                      className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase">Project Description</Label>
+                    <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Project Description</Label>
                     <Textarea
                       placeholder="Describe the scope of work..."
                       value={details.projectDescription}
                       onChange={(e) =>
                         setDetails({ ...details, projectDescription: e.target.value })
                       }
-                      rows={3}
+                      className="bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 min-h-[80px] resize-none"
                     />
                   </div>
                 </div>
 
                 {/* Timeline */}
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="space-y-4 pt-5 border-t border-white/6">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Timeline
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Start Date</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Start Date</Label>
                       <Input
                         type="date"
                         value={details.startDate}
                         onChange={(e) =>
                           setDetails({ ...details, startDate: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">End Date</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">End Date</Label>
                       <Input
                         type="date"
                         value={details.endDate}
                         onChange={(e) =>
                           setDetails({ ...details, endDate: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Payment */}
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <div className="space-y-4 pt-5 border-t border-white/6">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
                     Payment Terms
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Payment Amount</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Payment Amount</Label>
                       <Input
                         placeholder="$1,000"
                         value={details.paymentAmount}
                         onChange={(e) =>
                           setDetails({ ...details, paymentAmount: e.target.value })
                         }
-                        className="h-10"
+                        className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-medium text-muted-foreground uppercase">Payment Terms</Label>
+                      <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Payment Terms</Label>
                       <Select
                         value={details.paymentTerms}
                         onValueChange={(value) =>
                           setDetails({ ...details, paymentTerms: value || "Net 30" })
                         }
                       >
-                        <SelectTrigger className="h-10">
+                        <SelectTrigger className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Due on receipt">Due on receipt</SelectItem>
-                          <SelectItem value="Net 15">Net 15</SelectItem>
-                          <SelectItem value="Net 30">Net 30</SelectItem>
-                          <SelectItem value="Net 60">Net 60</SelectItem>
-                          <SelectItem value="50% upfront, 50% on completion">50% upfront, 50% on completion</SelectItem>
+                        <SelectContent className="bg-[#05050a] border-white/10">
+                          <SelectItem value="Due on receipt" className="text-white focus:bg-white/10">Due on receipt</SelectItem>
+                          <SelectItem value="Net 15" className="text-white focus:bg-white/10">Net 15</SelectItem>
+                          <SelectItem value="Net 30" className="text-white focus:bg-white/10">Net 30</SelectItem>
+                          <SelectItem value="Net 60" className="text-white focus:bg-white/10">Net 60</SelectItem>
+                          <SelectItem value="50% upfront, 50% on completion" className="text-white focus:bg-white/10">50% upfront, 50% on completion</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -462,42 +489,42 @@ Date: _______________            Date: _______________`;
                 </div>
 
                 {/* Additional Terms */}
-                <div className="space-y-4 pt-4 border-t border-border/30">
-                  <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Additional Terms</h4>
+                <div className="space-y-4 pt-5 border-t border-white/6">
+                  <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider">Additional Terms</h4>
                   <Textarea
                     placeholder="Any special conditions, cancellation policy, or additional terms..."
                     value={details.additionalTerms}
                     onChange={(e) =>
                       setDetails({ ...details, additionalTerms: e.target.value })
                     }
-                    rows={3}
+                    className="bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 min-h-[80px] resize-none"
                   />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Preview */}
           <div className="lg:col-span-2">
-            <div className="sticky top-24 space-y-4">
-              <Card className="border-border/50 shadow-elevated overflow-hidden">
-                <div className="bg-slate-50 px-4 py-3 border-b border-border/50 flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contract Preview</span>
+            <div className="sticky top-6 space-y-4">
+              <div className="bg-white/[0.02] border border-white/6 rounded-2xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-white/6 flex items-center justify-between">
+                  <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Contract Preview</span>
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs text-emerald-600 font-medium">Live</span>
+                    <span className="text-xs text-emerald-400 font-medium">Live</span>
                   </div>
                 </div>
-                <CardContent className="p-6 print:p-0">
-                  <pre className="whitespace-pre-wrap font-mono text-xs sm:text-sm text-foreground leading-relaxed">
+                <div className="p-6">
+                  <pre className="whitespace-pre-wrap font-mono text-xs sm:text-sm text-white/70 leading-relaxed">
                     {getTemplateContent()}
                   </pre>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

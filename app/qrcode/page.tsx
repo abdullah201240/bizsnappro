@@ -1,13 +1,22 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { QRCodeSVG } from "qrcode.react";
-import { QrCode, Download, Copy, Check, Trash2, Link2, ScanLine, Image, Maximize2 } from "lucide-react";
+import { 
+  QrCode, 
+  Download, 
+  Copy, 
+  Check, 
+  Trash2, 
+  Link2, 
+  ScanLine, 
+  Maximize2,
+  ArrowLeft
+} from "lucide-react";
+import Link from "next/link";
 
 interface QRCodeItem {
   id: string;
@@ -17,6 +26,13 @@ interface QRCodeItem {
   size: number;
   createdAt: string;
 }
+
+const sizeOptions = [
+  { label: "Small", value: 128, desc: "Business cards" },
+  { label: "Medium", value: 256, desc: "Web & print" },
+  { label: "Large", value: 512, desc: "Posters & signs" },
+  { label: "Extra Large", value: 1024, desc: "Billboards" },
+];
 
 export default function QRCodePage() {
   const [items, setItems] = useState<QRCodeItem[]>([]);
@@ -86,60 +102,59 @@ export default function QRCodePage() {
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  const sizeOptions = [
-    { label: "Small", value: 128, desc: "Business cards" },
-    { label: "Medium", value: 256, desc: "Web & print" },
-    { label: "Large", value: 512, desc: "Posters & signs" },
-    { label: "Extra Large", value: 1024, desc: "Billboards" },
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#05050a] text-white font-sans">
       {/* Header */}
-      <div className="border-b border-border/50 bg-white">
-        <div className="container py-8 sm:py-10">
+      <header className="bg-gradient-to-b from-rose-500/8 to-transparent border-b border-white/6 relative overflow-hidden">
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-30" style={{
+          backgroundImage: `linear-gradient(rgba(244,63,94,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(244,63,94,0.03) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50">
-                  <QrCode className="h-4 w-4 text-rose-600" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-rose-600/20 flex items-center justify-center">
+                  <QrCode className="w-5 h-5 text-rose-400" />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">QR Code Generator</span>
+                <span className="text-xs font-medium text-white/40 uppercase tracking-wider">QR Code Generator</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Generate QR Codes</h1>
-              <p className="text-muted-foreground mt-1">Create scannable codes for payments and links</p>
+              <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Generate QR Codes</h1>
+              <p className="text-sm text-white/50">Create scannable codes for payments and links</p>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container py-8">
+      <main className="max-w-[1600px] mx-auto px-5 md:px-10 py-8">
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Generate Form */}
           <div className="lg:col-span-1">
-            <Card className="border-border/50 shadow-card sticky top-24">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <ScanLine className="h-4 w-4" />
+            <div className="bg-white/[0.02] border border-white/6 rounded-2xl sticky top-6">
+              <div className="px-6 py-5 border-b border-white/6">
+                <h2 className="font-syne text-base font-bold text-white flex items-center gap-2">
+                  <ScanLine className="w-4 h-4" />
                   Create QR Code
-                </CardTitle>
-                <CardDescription>Generate a scannable QR code</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                </h2>
+                <p className="text-xs text-white/40 mt-1">Generate a scannable QR code</p>
+              </div>
+              <div className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase">Name</Label>
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Name</Label>
                   <Input
                     placeholder="e.g., Invoice #123 Payment"
                     value={newItem.name}
                     onChange={(e) =>
                       setNewItem({ ...newItem, name: e.target.value })
                     }
-                    className="h-10"
+                    className="bg-white/5 border-white/10 rounded-xl h-11 text-sm text-white placeholder:text-white/30"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider flex items-center gap-1.5">
                     <Link2 className="h-3 w-3" />
                     Content / URL
                   </Label>
@@ -149,24 +164,24 @@ export default function QRCodePage() {
                     onChange={(e) =>
                       setNewItem({ ...newItem, content: e.target.value })
                     }
-                    rows={3}
+                    className="bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 min-h-[80px] resize-none"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase">Description (Optional)</Label>
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">Description (Optional)</Label>
                   <Textarea
                     placeholder="What is this QR code for?"
                     value={newItem.description}
                     onChange={(e) =>
                       setNewItem({ ...newItem, description: e.target.value })
                     }
-                    rows={2}
+                    className="bg-white/5 border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 min-h-[60px] resize-none"
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="text-[11px] font-semibold text-white/50 uppercase tracking-wider flex items-center gap-1.5">
                     <Maximize2 className="h-3 w-3" />
                     Size
                   </Label>
@@ -175,96 +190,90 @@ export default function QRCodePage() {
                       <button
                         key={option.value}
                         onClick={() => setNewItem({ ...newItem, size: option.value })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        className={`p-3 rounded-xl border-2 text-left transition-all ${
                           newItem.size === option.value
-                            ? "border-slate-900 bg-slate-50"
-                            : "border-border/50 hover:border-border hover:bg-muted/30"
+                            ? "border-rose-500/50 bg-rose-500/10"
+                            : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
                         }`}
                       >
-                        <p className={`font-medium text-sm ${newItem.size === option.value ? "text-slate-900" : "text-foreground"}`}>
+                        <p className={`font-medium text-sm ${newItem.size === option.value ? "text-white" : "text-white/80"}`}>
                           {option.label}
                         </p>
-                        <p className="text-xs text-muted-foreground">{option.desc}</p>
+                        <p className="text-xs text-white/40">{option.desc}</p>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <Button
+                <button
                   onClick={generateQRCode}
-                  className="w-full rounded-lg bg-slate-900 hover:bg-slate-800"
                   disabled={!newItem.content}
+                  className="w-full h-11 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 text-white text-sm font-medium flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-rose-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <QrCode className="h-4 w-4 mr-2" />
+                  <QrCode className="w-4 h-4" />
                   Generate QR Code
-                </Button>
-              </CardContent>
-            </Card>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* QR Codes List */}
           <div className="lg:col-span-2">
             {items.length === 0 ? (
-              <Card className="border-border/50 shadow-card">
-                <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-muted mb-6">
-                    <QrCode className="h-10 w-10 text-muted-foreground" />
+              <div className="bg-white/[0.02] border border-white/6 rounded-2xl">
+                <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+                  <div className="w-20 h-20 rounded-2xl bg-white/[0.05] flex items-center justify-center mb-6">
+                    <QrCode className="h-10 w-10 text-white/30" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No QR codes yet</h3>
-                  <p className="text-muted-foreground max-w-sm">
+                  <h3 className="text-lg font-semibold text-white mb-2">No QR codes yet</h3>
+                  <p className="text-white/40 max-w-sm">
                     Create your first QR code by entering a URL or text on the left. 
                     Perfect for payment links, invoices, or business cards.
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {items.map((item) => (
-                  <Card key={item.id} className="border-border/50 shadow-card overflow-hidden">
-                    <CardHeader className="pb-3">
+                  <div key={item.id} className="bg-white/[0.02] border border-white/6 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-4 border-b border-white/6">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-base font-semibold truncate">{item.name}</CardTitle>
+                          <h3 className="text-base font-semibold text-white truncate">{item.name}</h3>
                           {item.description && (
-                            <CardDescription className="text-xs mt-0.5 line-clamp-1">{item.description}</CardDescription>
+                            <p className="text-xs text-white/40 mt-0.5 line-clamp-1">{item.description}</p>
                           )}
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <button
                             onClick={() => copyToClipboard(item.content, item.id)}
-                            className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-blue-600"
+                            className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors"
                           >
                             {copiedId === item.id ? (
-                              <Check className="h-4 w-4 text-emerald-600" />
+                              <Check className="h-4 w-4 text-emerald-400" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          </button>
+                          <button
                             onClick={() => downloadQRCode(item)}
-                            className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-blue-600"
+                            className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 text-white/70 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors"
                           >
                             <Download className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          </button>
+                          <button
                             onClick={() => deleteItem(item.id)}
-                            className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600"
+                            className="h-8 w-8 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/30 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
-                          </Button>
+                          </button>
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
+                    </div>
+                    <div className="p-5 pt-4">
                       <div
                         ref={qrRef}
-                        className="flex justify-center p-6 bg-white rounded-xl border border-border/50 mb-3"
+                        className="flex justify-center p-5 bg-white rounded-xl border border-white/10 mb-3"
                       >
                         <QRCodeSVG
                           id={`qr-${item.id}`}
@@ -277,21 +286,21 @@ export default function QRCodePage() {
                         />
                       </div>
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground truncate flex-1 font-mono">
+                        <p className="text-xs text-white/40 truncate flex-1 font-mono">
                           {item.content}
                         </p>
-                        <span className="text-xs text-muted-foreground ml-2">
+                        <span className="text-xs text-white/30 ml-2">
                           {item.size}px
                         </span>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

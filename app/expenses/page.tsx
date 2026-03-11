@@ -112,11 +112,6 @@ export default function ExpensesPage() {
         }} />
         
         <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white no-underline mb-5 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          
           <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Track Expenses</h1>
           <p className="text-sm text-white/50">Monitor and manage your business spending</p>
         </div>

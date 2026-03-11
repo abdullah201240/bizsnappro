@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { 
   ArrowLeft,
   FileText,
@@ -11,6 +10,7 @@ import {
   StickyNote,
   CheckCircle2,
 } from "lucide-react";
+import Link from "next/link";
 import { 
   InvoiceDetailsCard,
   FromDetailsCard,
@@ -105,11 +105,6 @@ export default function InvoicesPage() {
         }} />
         
         <div className="relative z-10 max-w-[1600px] mx-auto px-5 md:px-10 py-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white no-underline mb-5 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          
           <h1 className="font-syne text-2xl md:text-3xl font-extrabold text-white mb-2">Create Invoice</h1>
           <p className="text-sm text-white/50 mb-6">Generate professional invoices in seconds</p>
 
