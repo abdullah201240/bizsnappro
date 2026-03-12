@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
 import { 
   Save, 
   Building2, 
@@ -18,22 +22,13 @@ import {
   getProfile 
 } from "@/lib/api/settings";
 import { useAuth } from "@/components/providers/auth-provider";
-import { 
-  Currency, 
-  Timezone, 
-  SettingsFormData
-} from "@/lib/types/database";
+import { Currency, Timezone } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   Card, 
   CardContent, 
@@ -42,7 +37,39 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 
-const defaultSettings: SettingsFormData = {
+// Zod Schema for form validation
+const settingsSchema = z.object({
+  name: z.string().min(1, "Business name is required"),
+  business_type: z.string(),
+  email: z.string().email("Invalid email").or(z.literal("")),
+  phone: z.string().optional(),
+  website: z.string().url("Invalid URL").or(z.literal("")),
+  tax_id: z.string().optional(),
+  address_line1: z.string().optional(),
+  address_line2: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string(),
+  timezone: z.string(),
+  locale: z.string(),
+  default_currency: z.string(),
+  date_format: z.string(),
+  invoice_prefix: z.string(),
+  invoice_start_number: z.coerce.number().min(1),
+  invoice_default_payment_terms: z.string(),
+  invoice_default_tax_rate: z.coerce.number().min(0).max(100),
+  invoice_default_notes: z.string().optional(),
+  invoice_default_terms: z.string().optional(),
+  invoice_footer_text: z.string().optional(),
+  tax_number: z.string().optional(),
+  tax_label: z.string(),
+  enable_tax: z.coerce.number().min(0).max(100),
+});
+
+type SettingsFormData = z.infer<typeof settingsSchema>;
+
+const defaultValues = {
   name: "",
   email: "",
   phone: "",
@@ -68,26 +95,33 @@ const defaultSettings: SettingsFormData = {
   tax_number: "",
   tax_label: "Tax",
   enable_tax: 0,
-  currency_decimal_separator: ".",
-  currency_thousand_separator: ",",
-  currency_symbol_position: "before",
   date_format: "YYYY-MM-DD"
-};
+} satisfies SettingsFormData;
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
-  const [settings, setSettings] = useState<SettingsFormData>(defaultSettings);
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [timezones, setTimezones] = useState<Timezone[]>([]);
   const [organizationId, setOrganizationId] = useState<string | null>(null);
-  
   const [activeTab, setActiveTab] = useState<"business" | "locale" | "invoice" | "tax">("business");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+    reset,
+    setValue,
+    watch,
+  } = useForm<SettingsFormData>({
+    resolver: zodResolver(settingsSchema),
+    defaultValues,
+  });
+
+  const watchedValues = watch();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -113,7 +147,7 @@ export default function SettingsPage() {
           setOrganizationId(profile.organization_id);
           const fullSettings = await getFullSettings(profile.organization_id);
           
-          setSettings({
+          reset({
             name: fullSettings.name || "",
             email: fullSettings.email || "",
             phone: fullSettings.phone || "",
@@ -135,63 +169,61 @@ export default function SettingsPage() {
             invoice_default_tax_rate: fullSettings.invoice_default_tax_rate || 0,
             invoice_default_notes: fullSettings.invoice_default_notes || "",
             invoice_default_terms: fullSettings.invoice_default_terms || "",
-            invoice_footer_text: fullSettings.invoice_footer_text || "",
             tax_number: fullSettings.tax_number || "",
             tax_label: fullSettings.tax_label || "Tax",
             enable_tax: fullSettings.enable_tax || 0,
-            currency_decimal_separator: fullSettings.currency_decimal_separator || ".",
-            currency_thousand_separator: fullSettings.currency_thousand_separator || ",",
-            currency_symbol_position: fullSettings.currency_symbol_position || "before",
             date_format: fullSettings.date_format || "YYYY-MM-DD"
           });
         }
       } catch (err) {
         console.error("Error loading settings:", err);
-        setError("Failed to load settings");
+        toast.error("Failed to load settings");
       } finally {
         setLoading(false);
       }
     }
     
     loadData();
-  }, [user]);
+  }, [user, reset]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) || 0 : value
-    }));
-    setSaved(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: SettingsFormData) => {
     if (!organizationId) return;
     
-    setSaving(true);
-    setError(null);
+    const savePromise = saveAllSettings(organizationId, data as any);
+    setIsSaving(true);
+    
+    toast.promise(savePromise, {
+      loading: "Saving settings...",
+      success: () => {
+        reset(data);
+        return "Settings saved successfully!";
+      },
+      error: (err) => {
+        return "Failed to save settings. Please try again.";
+      }
+    });
     
     try {
-      await saveAllSettings(organizationId, settings);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      await savePromise;
     } catch (err) {
-      console.error("Error saving settings:", err);
-      setError("Failed to save settings");
+      // Error handled by toast.promise
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
+  const currencyOptions = useMemo(() => 
+    currencies.map(c => ({ value: c.code, label: `${c.code} - ${c.name} (${c.symbol})` })),
+    [currencies]
+  );
+
+  const timezoneOptions = useMemo(() => 
+    timezones.map(tz => ({ value: tz.name, label: `${tz.name} (${tz.utc_offset})` })),
+    [timezones]
+  );
+
   if (authLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <SettingsPageSkeleton />;
   }
 
   const tabs = [
@@ -202,35 +234,44 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="mt-1 text-muted-foreground">
-          Manage your business profile, currency, and invoice settings
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your business profile, currency, and invoice settings
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <Button 
+            type="submit" 
+            form="settings-form"
+            disabled={isSaving}
+            className="gap-2 min-w-[140px]"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        {error && (
-          <Card className="mb-6 border-destructive">
-            <CardContent className="pt-6">
-              <p className="text-destructive">{error}</p>
-            </CardContent>
-          </Card>
-        )}
-
-        {saved && (
-          <Card className="mb-6 border-green-500 dark:border-green-700">
-            <CardContent className="pt-6">
-              <p className="text-green-600 dark:text-green-400">Settings saved successfully!</p>
-            </CardContent>
-          </Card>
-        )}
-
+      <form 
+        id="settings-form" 
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar Tabs - Horizontal on mobile, vertical sidebar on desktop */}
           <div className="lg:w-56 flex-shrink-0">
-            {/* Mobile: Horizontal scrollable tabs */}
             <div className="lg:hidden overflow-x-auto pb-2 -mx-4 px-4">
               <div className="flex gap-2">
                 {tabs.map((tab) => {
@@ -242,8 +283,8 @@ export default function SettingsPage() {
                       onClick={() => setActiveTab(tab.id as typeof activeTab)}
                       className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
                         activeTab === tab.id
-                          ? "bg-secondary text-secondary-foreground"
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -253,7 +294,7 @@ export default function SettingsPage() {
                 })}
               </div>
             </div>
-            {/* Desktop: Vertical sidebar */}
+            
             <Card className="hidden lg:block">
               <CardContent className="p-2">
                 {tabs.map((tab) => {
@@ -265,8 +306,8 @@ export default function SettingsPage() {
                       onClick={() => setActiveTab(tab.id as typeof activeTab)}
                       className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
                         activeTab === tab.id
-                          ? "bg-secondary text-secondary-foreground"
-                          : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted"
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -278,16 +319,12 @@ export default function SettingsPage() {
             </Card>
           </div>
 
-          {/* Content */}
-          <div className="flex-1">
-            {/* Business Settings */}
+          <div className="flex-1 space-y-6">
             {activeTab === "business" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Business Information</CardTitle>
-                  <CardDescription>
-                    Enter your business details
-                  </CardDescription>
+                  <CardDescription>Enter your business details</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,31 +332,28 @@ export default function SettingsPage() {
                       <Label htmlFor="name">Business Name *</Label>
                       <Input
                         id="name"
-                        name="name"
-                        value={settings.name}
-                        onChange={handleChange}
-                        required
+                        {...register("name")}
                         placeholder="Your Business Name"
+                        aria-invalid={!!errors.name}
                       />
+                      {errors.name && (
+                        <p className="text-sm text-destructive">{errors.name.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="business_type">Business Type</Label>
-                      <Select
-                        name="business_type"
-                        value={settings.business_type}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, business_type: value || "individual" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select business type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="individual">Individual / Sole Proprietor</SelectItem>
-                          <SelectItem value="llc">LLC</SelectItem>
-                          <SelectItem value="corporation">Corporation</SelectItem>
-                          <SelectItem value="partnership">Partnership</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.business_type}
+                        onValueChange={(v) => setValue("business_type", v, { shouldDirty: true })}
+                        options={[
+                          { value: "individual", label: "Individual / Sole Proprietor" },
+                          { value: "llc", label: "LLC" },
+                          { value: "corporation", label: "Corporation" },
+                          { value: "partnership", label: "Partnership" }
+                        ]}
+                        placeholder="Select business type"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -327,23 +361,18 @@ export default function SettingsPage() {
                       <Input
                         id="email"
                         type="email"
-                        name="email"
-                        value={settings.email}
-                        onChange={handleChange}
+                        {...register("email")}
                         placeholder="business@example.com"
+                        aria-invalid={!!errors.email}
                       />
+                      {errors.email && (
+                        <p className="text-sm text-destructive">{errors.email.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        name="phone"
-                        value={settings.phone}
-                        onChange={handleChange}
-                        placeholder="+1 234 567 8900"
-                      />
+                      <Input id="phone" type="tel" {...register("phone")} placeholder="+1 234 567 8900" />
                     </div>
 
                     <div className="space-y-2">
@@ -351,72 +380,31 @@ export default function SettingsPage() {
                       <Input
                         id="website"
                         type="url"
-                        name="website"
-                        value={settings.website}
-                        onChange={handleChange}
+                        {...register("website")}
                         placeholder="https://example.com"
+                        aria-invalid={!!errors.website}
                       />
+                      {errors.website && (
+                        <p className="text-sm text-destructive">{errors.website.message}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="tax_id">Tax ID / VAT</Label>
-                      <Input
-                        id="tax_id"
-                        type="text"
-                        name="tax_id"
-                        value={settings.tax_id}
-                        onChange={handleChange}
-                        placeholder="XX-XXXXXXX"
-                      />
+                      <Input id="tax_id" {...register("tax_id")} placeholder="XX-XXXXXXX" />
                     </div>
                   </div>
 
                   <div className="border-t pt-4">
-                    <h3 className="text-md font-medium mb-3">Address</h3>
+                    <h3 className="text-sm font-semibold mb-3">Address</h3>
                     <div className="space-y-3">
-                      <Input
-                        type="text"
-                        name="address_line1"
-                        value={settings.address_line1}
-                        onChange={handleChange}
-                        placeholder="Street address"
-                      />
-                      <Input
-                        type="text"
-                        name="address_line2"
-                        value={settings.address_line2}
-                        onChange={handleChange}
-                        placeholder="Apartment, suite, etc."
-                      />
+                      <Input {...register("address_line1")} placeholder="Street address" />
+                      <Input {...register("address_line2")} placeholder="Apartment, suite, etc." />
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <Input
-                          type="text"
-                          name="city"
-                          value={settings.city}
-                          onChange={handleChange}
-                          placeholder="City"
-                        />
-                        <Input
-                          type="text"
-                          name="state"
-                          value={settings.state}
-                          onChange={handleChange}
-                          placeholder="State"
-                        />
-                        <Input
-                          type="text"
-                          name="postal_code"
-                          value={settings.postal_code}
-                          onChange={handleChange}
-                          placeholder="Postal Code"
-                        />
-                        <Input
-                          type="text"
-                          name="country"
-                          value={settings.country}
-                          onChange={handleChange}
-                          placeholder="Country"
-                        />
+                        <Input {...register("city")} placeholder="City" />
+                        <Input {...register("state")} placeholder="State" />
+                        <Input {...register("postal_code")} placeholder="Postal Code" />
+                        <Input {...register("country")} placeholder="Country" />
                       </div>
                     </div>
                   </div>
@@ -424,266 +412,196 @@ export default function SettingsPage() {
               </Card>
             )}
 
-            {/* Locale & Currency Settings */}
             {activeTab === "locale" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Locale & Currency</CardTitle>
-                  <CardDescription>
-                    Set your timezone and currency preferences
-                  </CardDescription>
+                  <CardDescription>Set your timezone and currency preferences</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="timezone">Timezone</Label>
-                      <Select
-                        name="timezone"
-                        value={settings.timezone}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, timezone: value || "UTC" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select timezone" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timezones.map((tz) => (
-                            <SelectItem key={tz.id} value={tz.name}>
-                              {tz.name} ({tz.utc_offset})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.timezone}
+                        onValueChange={(v) => setValue("timezone", v, { shouldDirty: true })}
+                        options={timezoneOptions}
+                        placeholder="Select timezone"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="locale">Language</Label>
-                      <Select
-                        name="locale"
-                        value={settings.locale}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, locale: value || "en" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select language" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="en">English (US)</SelectItem>
-                          <SelectItem value="en-GB">English (UK)</SelectItem>
-                          <SelectItem value="es">Español</SelectItem>
-                          <SelectItem value="fr">Français</SelectItem>
-                          <SelectItem value="de">Deutsch</SelectItem>
-                          <SelectItem value="ar">العربية</SelectItem>
-                          <SelectItem value="bn">বাংলা</SelectItem>
-                          <SelectItem value="hi">हिन्दी</SelectItem>
-                          <SelectItem value="ja">日本語</SelectItem>
-                          <SelectItem value="zh">中文</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.locale}
+                        onValueChange={(v) => setValue("locale", v, { shouldDirty: true })}
+                        options={[
+                          { value: "en", label: "English (US)" },
+                          { value: "en-GB", label: "English (UK)" },
+                          { value: "es", label: "Español" },
+                          { value: "fr", label: "Français" },
+                          { value: "de", label: "Deutsch" },
+                          { value: "ar", label: "العربية" },
+                          { value: "bn", label: "বাংলা" },
+                          { value: "hi", label: "हिन्दी" },
+                          { value: "ja", label: "日本語" },
+                          { value: "zh", label: "中文" }
+                        ]}
+                        placeholder="Select language"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="default_currency">Default Currency</Label>
-                      <Select
-                        name="default_currency"
-                        value={settings.default_currency}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, default_currency: value || "USD" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {currencies.map((currency) => (
-                            <SelectItem key={currency.code} value={currency.code}>
-                              {currency.code} - {currency.name} ({currency.symbol})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.default_currency}
+                        onValueChange={(v) => setValue("default_currency", v, { shouldDirty: true })}
+                        options={currencyOptions}
+                        placeholder="Select currency"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="date_format">Date Format</Label>
-                      <Select
-                        name="date_format"
-                        value={settings.date_format}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, date_format: value || "YYYY-MM-DD" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select date format" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="YYYY-MM-DD">2024-12-31</SelectItem>
-                          <SelectItem value="DD/MM/YYYY">31/12/2024</SelectItem>
-                          <SelectItem value="MM/DD/YYYY">12/31/2024</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.date_format}
+                        onValueChange={(v) => setValue("date_format", v, { shouldDirty: true })}
+                        options={[
+                          { value: "YYYY-MM-DD", label: "2024-12-31" },
+                          { value: "DD/MM/YYYY", label: "31/12/2024" },
+                          { value: "MM/DD/YYYY", label: "12/31/2024" }
+                        ]}
+                        placeholder="Select date format"
+                      />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Invoice Settings */}
             {activeTab === "invoice" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Invoice Settings</CardTitle>
-                  <CardDescription>
-                    Configure your invoice defaults
-                  </CardDescription>
+                  <CardDescription>Configure your invoice defaults</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="invoice_prefix">Invoice Prefix</Label>
-                      <Input
-                        id="invoice_prefix"
-                        type="text"
-                        name="invoice_prefix"
-                        value={settings.invoice_prefix}
-                        onChange={handleChange}
-                        placeholder="INV-"
-                      />
+                      <Input {...register("invoice_prefix")} placeholder="INV-" />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="invoice_start_number">Starting Number</Label>
-                      <Input
-                        id="invoice_start_number"
-                        type="number"
-                        name="invoice_start_number"
-                        value={settings.invoice_start_number}
-                        onChange={handleChange}
-                        min={1}
-                      />
+                      <Input type="number" {...register("invoice_start_number")} min={1} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="invoice_default_payment_terms">Payment Terms</Label>
-                      <Select
-                        name="invoice_default_payment_terms"
-                        value={settings.invoice_default_payment_terms}
-                        onValueChange={(value) => setSettings(prev => ({ ...prev, invoice_default_payment_terms: value || "net30" }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select payment terms" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="due_on_receipt">Due on Receipt</SelectItem>
-                          <SelectItem value="net15">Net 15</SelectItem>
-                          <SelectItem value="net30">Net 30</SelectItem>
-                          <SelectItem value="net45">Net 45</SelectItem>
-                          <SelectItem value="net60">Net 60</SelectItem>
-                          <SelectItem value="net90">Net 90</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <SearchableSelect
+                        value={watchedValues.invoice_default_payment_terms}
+                        onValueChange={(v) => setValue("invoice_default_payment_terms", v, { shouldDirty: true })}
+                        options={[
+                          { value: "due_on_receipt", label: "Due on Receipt" },
+                          { value: "net15", label: "Net 15" },
+                          { value: "net30", label: "Net 30" },
+                          { value: "net45", label: "Net 45" },
+                          { value: "net60", label: "Net 60" },
+                          { value: "net90", label: "Net 90" }
+                        ]}
+                        placeholder="Select payment terms"
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="invoice_default_tax_rate">Default Tax Rate (%)</Label>
-                      <Input
-                        id="invoice_default_tax_rate"
-                        type="number"
-                        name="invoice_default_tax_rate"
-                        value={settings.invoice_default_tax_rate}
-                        onChange={handleChange}
-                        min={0}
-                        max={100}
-                        step={0.01}
-                      />
+                      <Input type="number" step="0.01" {...register("invoice_default_tax_rate")} min={0} max={100} />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="invoice_default_notes">Default Notes</Label>
-                    <Textarea
-                      id="invoice_default_notes"
-                      name="invoice_default_notes"
-                      value={settings.invoice_default_notes}
-                      onChange={handleChange}
-                      rows={2}
-                      placeholder="Thank you for your business!"
-                    />
+                    <Textarea {...register("invoice_default_notes")} rows={3} placeholder="Thank you for your business!" />
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Tax Settings */}
             {activeTab === "tax" && (
               <Card>
                 <CardHeader>
                   <CardTitle>Tax Settings</CardTitle>
-                  <CardDescription>
-                    Configure your tax settings
-                  </CardDescription>
+                  <CardDescription>Configure your tax settings</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="enable_tax">Enable Tax (%)</Label>
-                      <Input
-                        id="enable_tax"
-                        type="number"
-                        name="enable_tax"
-                        value={settings.enable_tax}
-                        onChange={handleChange}
-                        min={0}
-                        max={100}
-                        step={0.01}
-                      />
+                      <Input type="number" step="0.01" {...register("enable_tax")} min={0} max={100} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="tax_label">Tax Label</Label>
-                      <Input
-                        id="tax_label"
-                        type="text"
-                        name="tax_label"
-                        value={settings.tax_label}
-                        onChange={handleChange}
-                        placeholder="Tax, VAT, GST"
-                      />
+                      <Input {...register("tax_label")} placeholder="Tax, VAT, GST" />
                     </div>
 
                     <div className="md:col-span-2 space-y-2">
                       <Label htmlFor="tax_number">Tax Number</Label>
-                      <Input
-                        id="tax_number"
-                        type="text"
-                        name="tax_number"
-                        value={settings.tax_number}
-                        onChange={handleChange}
-                        placeholder="Your tax registration number"
-                      />
+                      <Input {...register("tax_number")} placeholder="Your tax registration number" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
             )}
-
-            {/* Save Button */}
-            <div className="mt-6 flex justify-end">
-              <Button
-                type="submit"
-                disabled={saving}
-                className="gap-2"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    Save Settings
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
         </div>
       </form>
+    </div>
+  );
+}
+
+function SettingsPageSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+        <Skeleton className="h-10 w-36" />
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="lg:w-56 flex-shrink-0">
+          <Card>
+            <CardContent className="p-2 space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex-1 space-y-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

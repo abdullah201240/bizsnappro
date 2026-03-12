@@ -8,6 +8,48 @@ import {
   SettingsFormData 
 } from '@/lib/types/database';
 
+// Cache durations (in milliseconds)
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+// Local storage keys
+const CACHE_KEYS = {
+  currencies: 'bizsnap_currencies_cache',
+  timezones: 'bizsnap_timezones_cache'
+};
+
+// Get cached data
+function getCachedData<T>(key: string): T | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const cached = localStorage.getItem(key);
+    if (!cached) return null;
+    
+    const { data, timestamp } = JSON.parse(cached);
+    if (Date.now() - timestamp > CACHE_DURATION) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return data as T;
+  } catch {
+    return null;
+  }
+}
+
+// Set cached data
+function setCachedData<T>(key: string, data: T): void {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.setItem(key, JSON.stringify({
+      data,
+      timestamp: Date.now()
+    }));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 /**
  * Get current user's organization
  */
@@ -137,9 +179,15 @@ export async function updateProfile(
 }
 
 /**
- * Get all currencies
+ * Get all currencies (cached for 24 hours)
  */
 export async function getCurrencies(): Promise<Currency[]> {
+  // Check cache first
+  const cached = getCachedData<Currency[]>(CACHE_KEYS.currencies);
+  if (cached && cached.length > 0) {
+    return cached;
+  }
+  
   const supabase = createClient();
   
   const { data, error } = await supabase
@@ -148,14 +196,27 @@ export async function getCurrencies(): Promise<Currency[]> {
     .eq('is_active', true)
     .order('name');
     
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error('Error fetching currencies:', error);
+    return [];
+  }
+  
+  // Cache the result
+  if (data && data.length > 0) {
+    setCachedData(CACHE_KEYS.currencies, data);
+  }
+  
   return data || [];
 }
 
 /**
- * Get all timezones
+ * Get all timezones (cached for 24 hours)
  */
 export async function getTimezones(): Promise<Timezone[]> {
+  // Check cache first
+  const cached = getCachedData<Timezone[]>(CACHE_KEYS.timezones);
+  if (cached) return cached;
+  
   const supabase = createClient();
   
   const { data, error } = await supabase
@@ -165,6 +226,12 @@ export async function getTimezones(): Promise<Timezone[]> {
     .order('name');
     
   if (error) throw new Error(error.message);
+  
+  // Cache the result
+  if (data) {
+    setCachedData(CACHE_KEYS.timezones, data);
+  }
+  
   return data || [];
 }
 
@@ -234,17 +301,29 @@ export async function saveAllSettings(
 }
 
 /**
- * Get full settings (organization + org_settings)
+ * Get full settings in a single optimized query
+ * Combines profile, organization, and settings with joins
  */
 export async function getFullSettings(organizationId: string) {
-  const [organization, orgSettings] = await Promise.all([
-    getOrganization(),
-    getOrganizationSettings(organizationId)
-  ]);
+  const supabase = createClient();
   
-  if (!organization || !orgSettings) {
-    throw new Error('Settings not found');
+  // Single query with join - gets organization + settings together
+  const { data: orgData, error: orgError } = await supabase
+    .from('organizations')
+    .select(`
+      *,
+      organization_settings (*)
+    `)
+    .eq('id', organizationId)
+    .single();
+  
+  if (orgError || !orgData) {
+    throw new Error(orgError?.message || 'Organization not found');
   }
+  
+  // Flatten the response
+  const organization = orgData;
+  const orgSettings = orgData.organization_settings?.[0] || {};
   
   return {
     ...organization,
