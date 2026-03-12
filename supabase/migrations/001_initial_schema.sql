@@ -442,12 +442,12 @@ ON CONFLICT (code) DO NOTHING;
 CREATE TABLE IF NOT EXISTS timezones (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    offset VARCHAR(10) NOT NULL,
+    utc_offset VARCHAR(10) NOT NULL,
     is_active BOOLEAN DEFAULT true
 );
 
 -- Common timezones
-INSERT INTO timezones (name, offset) VALUES
+INSERT INTO timezones (name, utc_offset) VALUES
 ('UTC', '+00:00'),
 ('America/New_York', '-05:00'),
 ('America/Chicago', '-06:00'),

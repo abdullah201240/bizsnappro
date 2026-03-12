@@ -134,7 +134,7 @@ export interface ExchangeRate {
 export interface Timezone {
   id: number;
   name: string;
-  offset: string;
+  utc_offset: string;
   is_active: boolean;
 }
 

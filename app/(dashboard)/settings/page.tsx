@@ -448,7 +448,7 @@ export default function SettingsPage() {
                         <SelectContent>
                           {timezones.map((tz) => (
                             <SelectItem key={tz.id} value={tz.name}>
-                              {tz.name} ({tz.offset})
+                              {tz.name} ({tz.utc_offset})
                             </SelectItem>
                           ))}
                         </SelectContent>
